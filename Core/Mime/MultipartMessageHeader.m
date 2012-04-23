@@ -47,7 +47,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 	while( offset < length - 2 ) {
 
 		// the !isspace condition is to support header unfolding
-		if( (*(uint16_t*) (bytes+offset)  == fields_separator) && !isspace(bytes[offset+2]) ) {
+		if( (*(uint16_t*) (bytes+offset)  == fields_separator) && ((offset == length - 2) || !(isspace(bytes[offset+2])) )) {
 			NSData* fieldData = [NSData dataWithBytesNoCopy:bytes length:offset freeWhenDone:NO];
 			MultipartMessageHeaderField* field = [[MultipartMessageHeaderField alloc] initWithData: fieldData  contentEncoding:formEncoding];
 			if( field ) {
@@ -61,7 +61,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 
 			// move to the next header field
 			bytes += offset + 2;
-			length -= offset - 2;
+			length -= offset + 2;
 			offset = 0;
 			continue;
 		}

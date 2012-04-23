@@ -213,16 +213,18 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			else {
 
 				// let the header parser do it's job from now on.
-				NSData * headerData = [NSData dataWithBytesNoCopy: (char*) workingData.bytes + offset length:headerEnd - offset freeWhenDone:NO];
+				NSData * headerData = [NSData dataWithBytesNoCopy: (char*) workingData.bytes + offset length:headerEnd + 2 - offset freeWhenDone:NO];
 				currentHeader = [[MultipartMessageHeader alloc] initWithData:headerData formEncoding:formEncoding];
-                if( [delegate respondsToSelector:@selector(processStartOfPartWithHeader:)] ) {
-                    [delegate processStartOfPartWithHeader:currentHeader];
-                }
+
 				if( nil == currentHeader ) {
 					// we've found the data is in wrong format.
 					HTTPLogError(@"MultipartFormDataParser: MultipartFormDataParser: wrong input format, coulnd't get a valid header");
 					return NO;
 				}
+                if( [delegate respondsToSelector:@selector(processStartOfPartWithHeader:)] ) {
+                    [delegate processStartOfPartWithHeader:currentHeader];
+                }
+
 				HTTPLogVerbose(@"MultipartFormDataParser: MultipartFormDataParser: Retrieved part header.");
 			}
 			// skip the two trailing \r\n, in addition to the whole header.
