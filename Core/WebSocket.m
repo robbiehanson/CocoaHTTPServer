@@ -111,7 +111,7 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	else if (![upgradeHeaderValue caseInsensitiveCompare:@"WebSocket"] == NSOrderedSame) {
 		isWebSocket = NO;
 	}
-	else if (![connectionHeaderValue caseInsensitiveCompare:@"Upgrade"] == NSOrderedSame) {
+	else if ([connectionHeaderValue rangeOfString:@"Upgrade" options:NSCaseInsensitiveSearch].location == NSNotFound) {
 		isWebSocket = NO;
 	}
 	
