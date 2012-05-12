@@ -27,7 +27,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		connection = parent; // Parents retain children, children do NOT retain parents
 		
 		fileFD = NULL_FD;
-		filePath = [fpath copy];
+		filePath = [[fpath copy] stringByResolvingSymlinksInPath];
 		if (filePath == nil)
 		{
 			HTTPLogWarn(@"%@: Init failed - Nil filePath", THIS_FILE);
