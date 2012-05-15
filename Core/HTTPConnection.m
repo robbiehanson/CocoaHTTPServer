@@ -331,6 +331,16 @@ static NSMutableArray *recentNonces;
 	return nil;
 }
 
+/*** 
+ * This method is called when we're secure. At this point one can inspect
+ * the (peer) certs as to decide how trustworhty things are.
+ */
+- (void)socketDidSecure:(GCDAsyncSocket *)sock {
+ 	HTTPLogTrace();
+   
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Password Protection
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -625,7 +635,7 @@ static NSMutableArray *recentNonces;
 			// Configure this connection to use the highest possible SSL level
 			[settings setObject:(NSString *)kCFStreamSocketSecurityLevelNegotiatedSSL
 						 forKey:(NSString *)kCFStreamSSLLevel];
-			
+
 			[asyncSocket startTLS:settings];
 		}
 	}

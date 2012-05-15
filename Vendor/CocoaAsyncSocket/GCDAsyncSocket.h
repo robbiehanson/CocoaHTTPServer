@@ -66,6 +66,7 @@ extern NSString *const GCDAsyncSocketThreadName;
 
 #if SECURE_TRANSPORT_MAYBE_AVAILABLE
 extern NSString *const GCDAsyncSocketSSLCipherSuites;
+extern NSString *const GCDAsyncSocketSSLClientSideAuthentication;
 #if TARGET_OS_IPHONE
 extern NSString *const GCDAsyncSocketSSLProtocolVersionMin;
 extern NSString *const GCDAsyncSocketSSLProtocolVersionMax;
@@ -949,6 +950,41 @@ typedef enum GCDAsyncSocketError GCDAsyncSocketError;
  * The host parameter will be an IP address, not a DNS name.
 **/
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port;
+
+#if SECURE_TRANSPORT_MAYBE_AVAILABLE
+/**
+ * Called to determine if the -socket:shouldTrustPeer: callback should be enabled.
+ * Returning YES here has some important effects on the underlying SSLContext.
+ *
+ * 1) If you're the client:
+ *    - This will set the SSL session option kSSLSessionOptionBreakOnServerAuth
+ *
+ * 2) If you're the server:
+ *    - This will set the SSL session option kSSLSessionOptionBreakOnClientAuth
+ *    - It will also force the client to provide client certificates by setting
+ *      SSLSetClientSideAuthenticate to kAlwaysAuthenticate.
+ **/
+- (BOOL)shouldManuallyEvaluatePeerTrustForSocket:(GCDAsyncSocket *)sock;
+
+/**
+ * Allows a socket delegate to hook into the TLS handshake and manually validate
+ * the peer it's connecting to.
+ *
+ * This is only called if -shouldManuallyEvaluatePeerTrustForSocket: returns YES.
+ *
+ * Returning YES continues the SSL handshake. One can then use -socketDidSecure:
+ * to evaluate. (XXX or should we instroduce a 'canConnect' sort of BOOL with a
+ * SecCerurityRef array).
+ *
+ * Returning NO terminates the handshake and closes the connection.
+ **/
+- (BOOL)socket:(GCDAsyncSocket *)sock shouldTrustPeer:(SecTrustRef)trust;
+
+/**
+ * List of (certificates) to validate the peer against.
+ */
+-(NSArray *) trustedRootsForSocket:(GCDAsyncSocket *)sock;
+#endif
 
 /**
  * Called when a socket has completed reading the requested data into memory.

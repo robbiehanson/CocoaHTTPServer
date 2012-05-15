@@ -18,6 +18,8 @@
   #import <CFNetwork/CFNetwork.h>
 #endif
 
+#import <Security/SecureTransport.h>
+
 #import <arpa/inet.h>
 #import <fcntl.h>
 #import <ifaddrs.h>
@@ -32,13 +34,13 @@
 #import <unistd.h>
 
 
-#if 0
+#if 1
 
 // Logging Enabled - See log level below
 
 // Logging uses the CocoaLumberjack framework (which is also GCD based).
 // http://code.google.com/p/cocoalumberjack/
-// 
+//
 // It allows us to do a lot of logging without significantly slowing down the code.
 #import "DDLog.h"
 
@@ -106,6 +108,7 @@ NSString *const GCDAsyncSocketThreadName = @"GCDAsyncSocket-CFStream";
 
 #if SECURE_TRANSPORT_MAYBE_AVAILABLE
 NSString *const GCDAsyncSocketSSLCipherSuites = @"GCDAsyncSocketSSLCipherSuites";
+NSString *const GCDAsyncSocketSSLClientSideAuthentication = @"GCDAsyncSocketClientSideAuthentication";
 #if TARGET_OS_IPHONE
 NSString *const GCDAsyncSocketSSLProtocolVersionMin = @"GCDAsyncSocketSSLProtocolVersionMin";
 NSString *const GCDAsyncSocketSSLProtocolVersionMax = @"GCDAsyncSocketSSLProtocolVersionMax";
@@ -5857,8 +5860,69 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 			return;
 		}
 	}
-	#endif
-	
+    #endif
+
+    if (delegateQueue && [delegate respondsToSelector:@selector(trustedRootsForSocket:)])
+    {	
+        __block NSArray * trustedRoots = nil;
+        dispatch_sync(delegateQueue, ^{
+            @autoreleasepool {
+                trustedRoots = [delegate trustedRootsForSocket:self];
+            }
+        });
+        if (trustedRoots) {
+            status = SSLSetTrustedRoots(sslContext, (__bridge CFArrayRef)(trustedRoots), YES);
+            if (status != noErr) {
+                [self closeWithError:[self otherError:@"Failed to setTrustedRoots"]];
+                return;                
+            }
+#ifdef LogAsync
+            LogVerbose(@"Peer is to be verified against %d certificates:",[trustedRoots count]);
+            for(int i = 0; i < [trustedRoots count]; i++)
+                LogVerbose(@" %03d: %@", i+1, SecCertificateCopySubjectSummary((SecCertificateRef)CFArrayGetValueAtIndex((__bridge CFArrayRef)(trustedRoots), i)));
+#endif
+        }
+    }
+    if (delegateQueue && [delegate respondsToSelector:@selector(shouldManuallyEvaluatePeerTrustForSocket:)])
+    {
+        __block BOOL manuallyEvaluateTrust = NO;
+        dispatch_sync(delegateQueue, ^{
+            @autoreleasepool {
+                manuallyEvaluateTrust = [delegate shouldManuallyEvaluatePeerTrustForSocket:self];
+            }
+        });
+                
+        if (manuallyEvaluateTrust)
+        {
+            NSCAssert([delegate respondsToSelector:@selector(socket:shouldTrustPeer:)],
+
+                      @"You need to implement -socket:shouldTrustPeer: if you return YES for -shouldManuallyEvaluatePeerTrustForSocket:");
+            
+            NSNumber * value = [tlsSettings objectForKey:GCDAsyncSocketSSLClientSideAuthentication];
+            
+            if (isServer && (value == nil || [value intValue] == kNeverAuthenticate))
+            {
+                NSMutableDictionary * newTLSSettings = [NSMutableDictionary dictionaryWithDictionary:tlsSettings];
+                [newTLSSettings setObject:[NSNumber numberWithInt:kAlwaysAuthenticate] forKey:GCDAsyncSocketSSLClientSideAuthentication];
+                tlsSettings = newTLSSettings;
+
+#if TARGET_OS_IPHONE
+                status = SSLSetSessionOption(sslContext, kSSLSessionOptionBreakOnClientAuth, true);
+                if (status != noErr) {
+                    [self closeWithError:[self otherError:@"Error in SSLSetSessionOption"]];
+                    return;
+                }
+#endif
+            } else {
+                status = SSLSetSessionOption(sslContext, kSSLSessionOptionBreakOnServerAuth, true);
+                if (status != noErr) {
+                    [self closeWithError:[self otherError:@"Error in SSLSetSessionOption"]];
+                    return;
+                }
+            }
+        }
+	}
+
 	status = SSLSetIOFuncs(sslContext, &SSLReadFunction, &SSLWriteFunction);
 	if (status != noErr)
 	{
@@ -5885,8 +5949,9 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	// 7. kCFStreamSSLLevel (GCDAsyncSocketSSLProtocolVersionMin / GCDAsyncSocketSSLProtocolVersionMax)
 	// 8. GCDAsyncSocketSSLCipherSuites
 	// 9. GCDAsyncSocketSSLDiffieHellmanParameters (Mac)
-	
-	id value;
+    // 10. GCDAsyncSocketSSLClientSideAuthentication
+
+    id value;
 	
 	// 1. kCFStreamSSLPeerName
 	
@@ -6170,7 +6235,23 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 		}
 	}
 	#endif
-	
+
+    // 10. GCDAsyncSocketSSLClientSideAuthentication
+    if (isServer) {
+        value = [tlsSettings objectForKey:GCDAsyncSocketSSLClientSideAuthentication];
+        NSNumber *sslAuthNumber = (NSNumber *)value;
+        int sslAuth = [sslAuthNumber intValue];
+        if (sslAuth == kTryAuthenticate
+            || sslAuth == kAlwaysAuthenticate
+            || sslAuth == kNeverAuthenticate)
+            status = SSLSetClientSideAuthenticate(sslContext, sslAuth);
+        if (status != noErr)
+        {
+            [self closeWithError:[self otherError:@"Error in SSLSetClientSideAuthenticate"]];
+            return;
+        };
+    }
+
 	// Setup the sslReadBuffer
 	// 
 	// If there is any data in the partialReadBuffer,
@@ -6203,7 +6284,59 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	if (status == noErr)
 	{
 		LogVerbose(@"SSLHandshake complete");
-		
+
+        OSStatus status;
+        
+        SSLClientCertificateState clState = -1;
+        SSLGetClientCertificateState(sslContext, &clState);
+        
+        if (clState == kSSLClientCertSent)
+        {
+            LogVerbose(@"SSLHandshake kSSLClientCertSent");
+           id theDelegate = delegate;
+         
+            if (delegateQueue && [delegate respondsToSelector:@selector(socket:shouldTrustPeer:)]) {
+                SecTrustRef trust = NULL;
+                status = SSLCopyPeerTrust(sslContext, &trust);
+                if (status != noErr)
+                {
+                    NSLog(@"SSLCopyPeerTrust failed in kSSLClientCertSent: %d", status);
+                    [self closeWithError:[self sslError:status]];
+                    return;
+                }
+                
+                __block BOOL shouldTrust = NO;
+                dispatch_sync(delegateQueue, ^{
+                    @autoreleasepool {
+                        shouldTrust = [theDelegate socket:self shouldTrustPeer:trust];
+                    }
+                });
+
+                if (!shouldTrust)
+                {
+                    LogWarn(@"Close connection on shouldTrustPeer reject");
+                    [self closeWithError:[self sslError:status]];
+                    return;
+                }
+            };
+            
+#ifdef LogAsync
+            CFArrayRef  certsRef = NULL;
+            status = SSLCopyPeerCertificates(sslContext, &certsRef);
+            if (status == noErr) {
+                LogVerbose(@"Information on connecting/connected peer:");
+                for(int i = 0; i < CFArrayGetCount(certsRef); i++) {
+                    SecCertificateRef cert = (SecCertificateRef)CFArrayGetValueAtIndex(certsRef, i);
+                    CFStringRef commonName;
+                    SecCertificateCopyCommonName(cert, &commonName);
+                    LogVerbose(@"Connecting peer: %s Cert %d - %@",( i==0) ? "Identity" : "CA Chain", i+1, commonName);
+                }
+            } else {
+                LogError(@"SSLCopyPeerCertificates() netted nothing: %d", status);
+            }
+#endif
+        }
+        
 		flags &= ~kStartingReadTLS;
 		flags &= ~kStartingWriteTLS;
 		
@@ -6225,6 +6358,17 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 		[self maybeDequeueRead];
 		[self maybeDequeueWrite];
 	}
+    else if (status == errSSLUnknownRootCert) {
+    }
+#if 0
+    else if (status == errSSLPeerAuthCompleted) {
+    }
+#endif
+    else if (status == errSSLUnknownRootCert) {
+        NSLog(@"errSSLUnknownRootCert.");
+        [self closeWithError:[self sslError:status]];
+    }
+
 	else if (status == errSSLWouldBlock)
 	{
 		LogVerbose(@"SSLHandshake continues...");
