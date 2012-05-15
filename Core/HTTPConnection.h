@@ -76,6 +76,7 @@
 
 - (BOOL)isSecureServer;
 - (NSArray *)sslIdentityAndCertificates;
+- (void)socketDidSecure:(GCDAsyncSocket *)sock;
 
 - (BOOL)isPasswordProtected:(NSString *)path;
 - (BOOL)useDigestAccessAuthentication;
