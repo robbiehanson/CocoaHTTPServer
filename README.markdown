@@ -17,4 +17,4 @@ Sometimes developers need an embedded HTTP server in their app. Perhaps it's a s
 Can't find the answer to your question in any of the [wiki](https://github.com/robbiehanson/CocoaHTTPServer/wiki) articles? Try the **[mailing list](http://groups.google.com/group/cocoahttpserver)**.
 <br/>
 <br/>
-Love the project? Wanna buy me a coffee? (or a beer :D) [![donation](http://www.paypal.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/us/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9404262)
+Love the project? Wanna buy me a coffee? (or a beer :D) [![donation](http://www.paypal.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BHF2DJRETGV5S)
