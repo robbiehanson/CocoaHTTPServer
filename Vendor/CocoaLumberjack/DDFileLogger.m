@@ -19,6 +19,31 @@
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
+// Does ARC support support GCD objects?
+// It does if the minimum deployment target is iOS 6+ or Mac OS X 8+
+
+#if TARGET_OS_IPHONE
+
+  // Compiling for iOS
+
+  #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000 // iOS 6.0 or later
+    #define NEEDS_DISPATCH_RETAIN_RELEASE 0
+  #else                                         // iOS 5.X or earlier
+    #define NEEDS_DISPATCH_RETAIN_RELEASE 1
+  #endif
+
+#else
+
+  // Compiling for Mac OS X
+
+  #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1080     // Mac OS X 10.8 or later
+    #define NEEDS_DISPATCH_RETAIN_RELEASE 0
+  #else
+    #define NEEDS_DISPATCH_RETAIN_RELEASE 1     // Mac OS X 10.7 or earlier
+  #endif
+
+#endif
+
 // We probably shouldn't be using DDLog() statements within the DDLog implementation.
 // But we still want to leave our log statements for any future debugging,
 // and to allow other developers to trace the implementation (which is a great learning tool).
@@ -82,6 +107,11 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	[self removeObserver:self forKeyPath:@"maximumNumberOfLogFiles"];
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Configuration
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,9 +152,14 @@
 {
 	NSLogVerbose(@"DDLogFileManagerDefault: deleteOldLogFiles");
 	
-	NSArray *sortedLogFileInfos = [self sortedLogFileInfos];
-	
 	NSUInteger maxNumLogFiles = self.maximumNumberOfLogFiles;
+	if (maxNumLogFiles == 0)
+	{
+		// Unlimited - don't delete any log files
+		return;
+	}
+	
+	NSArray *sortedLogFileInfos = [self sortedLogFileInfos];
 	
 	// Do we consider the first file?
 	// We are only supposed to be deleting archived files.
@@ -156,16 +191,13 @@
 	}
 	
 	NSUInteger i;
-	for (i = 0; i < count; i++)
+	for (i = maxNumLogFiles; i < count; i++)
 	{
-		if (i >= maxNumLogFiles)
-		{
-			DDLogFileInfo *logFileInfo = [sortedArchivedLogFileInfos objectAtIndex:i];
-			
-			NSLogInfo(@"DDLogFileManagerDefault: Deleting file: %@", logFileInfo.fileName);
-			
-			[[NSFileManager defaultManager] removeItemAtPath:logFileInfo.filePath error:nil];
-		}
+		DDLogFileInfo *logFileInfo = [sortedArchivedLogFileInfos objectAtIndex:i];
+		
+		NSLogInfo(@"DDLogFileManagerDefault: Deleting file: %@", logFileInfo.fileName);
+		
+		[[NSFileManager defaultManager] removeItemAtPath:logFileInfo.filePath error:nil];
 	}
 }
 
@@ -413,11 +445,23 @@
 
 - (id)init
 {
-	if((self = [super init]))
+	return [self initWithDateFormatter:nil];
+}
+
+- (id)initWithDateFormatter:(NSDateFormatter *)aDateFormatter
+{
+	if ((self = [super init]))
 	{
-		dateFormatter = [[NSDateFormatter alloc] init];
-		[dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-		[dateFormatter setDateFormat:@"yyyy/MM/dd HH:mm:ss:SSS"];
+		if (aDateFormatter)
+		{
+			dateFormatter = aDateFormatter;
+		}
+		else
+		{
+			dateFormatter = [[NSDateFormatter alloc] init];
+			[dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4]; // 10.4+ style
+			[dateFormatter setDateFormat:@"yyyy/MM/dd HH:mm:ss:SSS"];
+		}
 	}
 	return self;
 }
@@ -466,7 +510,6 @@
 	if (rollingTimer)
 	{
 		dispatch_source_cancel(rollingTimer);
-		dispatch_release(rollingTimer);
 		rollingTimer = NULL;
 	}
 }
@@ -492,12 +535,12 @@
 	}
 	else
 	{
-		dispatch_queue_t loggingQueue = [DDLog loggingQueue];
-		NSAssert(currentQueue != loggingQueue, @"Core architecture requirement failure");
+		dispatch_queue_t globalLoggingQueue = [DDLog loggingQueue];
+		NSAssert(currentQueue != globalLoggingQueue, @"Core architecture requirement failure");
 		
 		__block unsigned long long result;
 		
-		dispatch_sync(loggingQueue, ^{
+		dispatch_sync(globalLoggingQueue, ^{
 			dispatch_sync(loggerQueue, ^{
 				result = maximumFileSize;
 			});
@@ -526,10 +569,10 @@
 	}
 	else
 	{
-		dispatch_queue_t loggingQueue = [DDLog loggingQueue];
-		NSAssert(currentQueue != loggingQueue, @"Core architecture requirement failure");
+		dispatch_queue_t globalLoggingQueue = [DDLog loggingQueue];
+		NSAssert(currentQueue != globalLoggingQueue, @"Core architecture requirement failure");
 		
-		dispatch_async(loggingQueue, ^{
+		dispatch_async(globalLoggingQueue, ^{
 			dispatch_async(loggerQueue, block);
 		});
 	}
@@ -550,12 +593,12 @@
 	}
 	else
 	{
-		dispatch_queue_t loggingQueue = [DDLog loggingQueue];
-		NSAssert(currentQueue != loggingQueue, @"Core architecture requirement failure");
+		dispatch_queue_t globalLoggingQueue = [DDLog loggingQueue];
+		NSAssert(currentQueue != globalLoggingQueue, @"Core architecture requirement failure");
 		
 		__block NSTimeInterval result;
 		
-		dispatch_sync(loggingQueue, ^{
+		dispatch_sync(globalLoggingQueue, ^{
 			dispatch_sync(loggerQueue, ^{
 				result = rollingFrequency;
 			});
@@ -584,10 +627,10 @@
 	}
 	else
 	{
-		dispatch_queue_t loggingQueue = [DDLog loggingQueue];
-		NSAssert(currentQueue != loggingQueue, @"Core architecture requirement failure");
+		dispatch_queue_t globalLoggingQueue = [DDLog loggingQueue];
+		NSAssert(currentQueue != globalLoggingQueue, @"Core architecture requirement failure");
 		
-		dispatch_async(loggingQueue, ^{
+		dispatch_async(globalLoggingQueue, ^{
 			dispatch_async(loggerQueue, block);
 		});
 	}
@@ -602,11 +645,10 @@
 	if (rollingTimer)
 	{
 		dispatch_source_cancel(rollingTimer);
-		dispatch_release(rollingTimer);
 		rollingTimer = NULL;
 	}
 	
-	if (currentLogFileInfo == nil)
+	if (currentLogFileInfo == nil || rollingFrequency <= 0.0)
 	{
 		return;
 	}
@@ -630,6 +672,13 @@
 		[self maybeRollLogFileDueToAge];
 		
 	}});
+	
+	#if NEEDS_DISPATCH_RETAIN_RELEASE
+	dispatch_source_t theRollingTimer = rollingTimer;
+	dispatch_source_set_cancel_handler(rollingTimer, ^{
+		dispatch_release(theRollingTimer);
+	});
+	#endif
 	
 	uint64_t delay = [logFileRollingDate timeIntervalSinceNow] * NSEC_PER_SEC;
 	dispatch_time_t fireTime = dispatch_time(DISPATCH_TIME_NOW, delay);
@@ -658,10 +707,10 @@
 	}
 	else
 	{
-		dispatch_queue_t loggingQueue = [DDLog loggingQueue];
-		NSAssert(currentQueue != loggingQueue, @"Core architecture requirement failure");
+		dispatch_queue_t globalLoggingQueue = [DDLog loggingQueue];
+		NSAssert(currentQueue != globalLoggingQueue, @"Core architecture requirement failure");
 		
-		dispatch_async(loggingQueue, ^{
+		dispatch_async(globalLoggingQueue, ^{
 			dispatch_async(loggerQueue, block);
 		});
 	}
@@ -690,14 +739,13 @@
 	if (rollingTimer)
 	{
 		dispatch_source_cancel(rollingTimer);
-		dispatch_release(rollingTimer);
 		rollingTimer = NULL;
 	}
 }
 
 - (void)maybeRollLogFileDueToAge
 {
-	if (currentLogFileInfo.age >= rollingFrequency)
+	if (rollingFrequency > 0.0 && currentLogFileInfo.age >= rollingFrequency)
 	{
 		NSLogVerbose(@"DDFileLogger: Rolling log file due to age...");
 		
@@ -714,16 +762,19 @@
 	// This method is called from logMessage.
 	// Keep it FAST.
 	
-	unsigned long long fileSize = [currentLogFileHandle offsetInFile];
-	
 	// Note: Use direct access to maximumFileSize variable.
 	// We specifically wrote our own getter/setter method to allow us to do this (for performance reasons).
 	
-	if (fileSize >= maximumFileSize) // YES, we are using direct access. Read note above.
+	if (maximumFileSize > 0)
 	{
-		NSLogVerbose(@"DDFileLogger: Rolling log file due to size...");
+		unsigned long long fileSize = [currentLogFileHandle offsetInFile];
 		
-		[self rollLogFileNow];
+		if (fileSize >= maximumFileSize)
+		{
+			NSLogVerbose(@"DDFileLogger: Rolling log file due to size (%qu)...", fileSize);
+			
+			[self rollLogFileNow];
+		}
 	}
 }
 
@@ -756,12 +807,12 @@
 				useExistingLogFile = NO;
 				shouldArchiveMostRecent = NO;
 			}
-			else if (mostRecentLogFileInfo.fileSize >= maximumFileSize)
+			else if (maximumFileSize > 0 && mostRecentLogFileInfo.fileSize >= maximumFileSize)
 			{
 				useExistingLogFile = NO;
 				shouldArchiveMostRecent = YES;
 			}
-			else if (mostRecentLogFileInfo.age >= rollingFrequency)
+			else if (rollingFrequency > 0.0 && mostRecentLogFileInfo.age >= rollingFrequency)
 			{
 				useExistingLogFile = NO;
 				shouldArchiveMostRecent = YES;
