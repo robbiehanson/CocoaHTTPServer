@@ -68,7 +68,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		if (wsHost == nil)
 		{
 			NSString *port = [NSString stringWithFormat:@"%hu", [asyncSocket localPort]];
-			wsLocation = [NSString stringWithFormat:@"%@://localhost:%@%/service", scheme, port];
+			wsLocation = [NSString stringWithFormat:@"%@://localhost:%@/service", scheme, port];
 		}
 		else
 		{

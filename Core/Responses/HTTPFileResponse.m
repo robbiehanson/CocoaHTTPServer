@@ -174,7 +174,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	
 	// Perform the read
 	
-	HTTPLogVerbose(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, bytesToRead);
+	HTTPLogVerbose(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, (unsigned long)bytesToRead);
 	
 	ssize_t result = read(fileFD, buffer, bytesToRead);
 	
@@ -196,7 +196,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	}
 	else // (result > 0)
 	{
-		HTTPLogVerbose(@"%@[%p]: Read %d bytes from file", THIS_FILE, self, result);
+		HTTPLogVerbose(@"%@[%p]: Read %ld bytes from file", THIS_FILE, self, (long)result);
 		
 		fileOffset += result;
 		
