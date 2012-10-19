@@ -38,7 +38,7 @@ static char encodingTable[64] = {
         [stringBuffer appendFormat:@"%02x", (unsigned int)dataBuffer[i]];
 	}
     
-    return [stringBuffer copy];
+    return [[stringBuffer copy] autorelease];
 }
 
 - (NSString *)base64Encoded
