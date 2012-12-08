@@ -12,6 +12,28 @@ Sometimes developers need an embedded HTTP server in their app. Perhaps it's a s
 -   Heavily commented code
 -   Very easily extensible
 -   WebDAV is supported too!
+-   Background support
+
+
+===========
+REQUIRES
+===========
+
+FRAMEWORKS:
+- UIKit
+- Foundation
+- CoreGraphics
+- CFNetwork
+- Security
+
++ Background Mode:
+- AVFoundation
+- CoreFoundation
+- AudioToolbox
+
+Info.plist:
+- Required background modes
+    - App plays audio
 
 <br/>
 Can't find the answer to your question in any of the [wiki](https://github.com/robbiehanson/CocoaHTTPServer/wiki) articles? Try the **[mailing list](http://groups.google.com/group/cocoahttpserver)**.
