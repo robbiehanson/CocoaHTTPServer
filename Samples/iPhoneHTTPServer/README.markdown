@@ -13,10 +13,10 @@ On the Xcode console you'll see a message saying:
 
 Now open your browser and type in the URL to access the server.
 If you're running it via the simulator, then you can use:
-http://localhost: 12345
+http://localhost:12345
 
 If you're running it on your device, then you'll need to use:
-http://<local IP of device>: 12345
+http://&lt;local IP of device&gt;:12345
 
 (Replace 12345 with whatever port the server is actually running on.)
 
