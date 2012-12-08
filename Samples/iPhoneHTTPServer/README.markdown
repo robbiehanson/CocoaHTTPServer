@@ -9,15 +9,35 @@ INSTRUCTIONS:
 Open the Xcode project, and build and go.
 
 On the Xcode console you'll see a message saying:
-"Started HTTP server on port 59123"
+"Started HTTP server on port 12345"
 
 Now open your browser and type in the URL to access the server.
 If you're running it via the simulator, then you can use:
-http://localhost:59123
+http://localhost: 12345
 
 If you're running it on your device, then you'll need to use:
-http://<local IP of device>:59123
+http://<local IP of device>: 12345
 
-(Replace 59123 with whatever port the server is actually running on.)
+(Replace 12345 with whatever port the server is actually running on.)
+
+ 
+REQUIRES:
+
+FRAMEWORKS:
+- UIKit
+- Foundation
+- CoreGraphics
+- CFNetwork
+- Security
+
++ Background Mode:
+- AVFoundation
+- CoreFoundation
+- AudioToolbox
+
+Info.plist:
+- Required background modes
+    - App plays audio
+
 
 Enjoy.
