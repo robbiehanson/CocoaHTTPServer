@@ -4213,16 +4213,13 @@ enum GCDAsyncSocketConfig
 	
 	if ([self usingCFStreamForTLS])
 	{
-		#if TARGET_OS_IPHONE
-		
-		// Relegated to using CFStream... :( Boo! Give us a full SecureTransport stack Apple!
-		
+        hasBytesAvailable = NO;
 		estimatedBytesAvailable = 0;
+		#if TARGET_OS_IPHONE
+		// Relegated to using CFStream... :( Boo! Give us a full SecureTransport stack Apple!
+
 		if ((flags & kSecureSocketHasBytesAvailable) && CFReadStreamHasBytesAvailable(readStream))
 			hasBytesAvailable = YES;
-		else
-			hasBytesAvailable = NO;
-		
 		#endif
 	}
 	else
