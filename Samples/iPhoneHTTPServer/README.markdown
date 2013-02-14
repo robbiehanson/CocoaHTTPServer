@@ -16,7 +16,7 @@ If you're running it via the simulator, then you can use:
 http://localhost:59123
 
 If you're running it on your device, then you'll need to use:
-http://<local IP of device>:59123
+http://&lt;local IP of device&gt;:59123
 
 (Replace 59123 with whatever port the server is actually running on.)
 
