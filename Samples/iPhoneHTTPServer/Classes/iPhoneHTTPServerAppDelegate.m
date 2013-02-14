@@ -12,16 +12,25 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 
 @synthesize window;
 @synthesize viewController;
+@synthesize httpServer;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+    
+    // Add the view controller's view to the window and display.
+    [window addSubview:viewController.view];
+    [window makeKeyAndVisible];
+    
+    
+    
 	// Configure our logging framework.
 	// To keep things simple and fast, we're just going to log to the Xcode console.
 	[DDLog addLogger:[DDTTYLogger sharedInstance]];
 	
 	// Create server using our custom MyHTTPServer class
 	httpServer = [[HTTPServer alloc] init];
-	
+    
 	// Tell the server to broadcast its presence via Bonjour.
 	// This allows browsers such as Safari to automatically discover our service.
 	[httpServer setType:@"_http._tcp."];
@@ -40,22 +49,51 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 	// Start the server (and check for problems)
 	
 	NSError *error;
-	if([httpServer start:&error])
-	{
-		DDLogInfo(@"Started HTTP Server on port %hu", [httpServer listeningPort]);
-	}
-	else
+	if(![httpServer start:&error])
 	{
 		DDLogError(@"Error starting HTTP Server: %@", error);
 	}
-	
-    // Add the view controller's view to the window and display.
-    [window addSubview:viewController.view];
-    [window makeKeyAndVisible];
-
+    
     return YES;
 }
 
 
+// Uncomment the following to disable continuous server
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    [self continuousServer];
+    
+    // or run server for ~1 s
+    //  [self tempServer];
+}
+
+- (void) continuousServer
+{
+    UIApplication*    app = [UIApplication sharedApplication];
+    
+    bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
+        // Clean up any unfinished task business by marking where you.
+        // stopped or ending the task outright.
+        [app endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
+    
+    // Start the long-running task and return immediately.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        audioPlayer = [[MTAudioPlayer alloc]init];
+        [audioPlayer playBackgroundAudio];
+        
+        // Must comment out or else will stop server
+        // [app endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    });
+}
+
+- (void) tempServer
+{
+    audioPlayer = [[MTAudioPlayer alloc]init];
+    [audioPlayer playBackgroundAudio];
+}
 
 @end

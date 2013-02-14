@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		188F42DD1672C3510079CC2F /* MTAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 188F42D91672C3510079CC2F /* MTAudioPlayer.m */; };
+		188F42E11672C3610079CC2F /* silence.wav in Resources */ = {isa = PBXBuildFile; fileRef = 188F42E01672C3610079CC2F /* silence.wav */; };
+		188F42EA1672C4700079CC2F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 188F42E91672C4700079CC2F /* AudioToolbox.framework */; };
+		188F42EC1672C4810079CC2F /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 188F42EB1672C4810079CC2F /* CoreFoundation.framework */; };
+		188F42EE1672C4A10079CC2F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 188F42ED1672C4A10079CC2F /* AVFoundation.framework */; };
 		1D3623260D0F684500981E51 /* iPhoneHTTPServerAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* iPhoneHTTPServerAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -43,6 +48,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		188F42D81672C3510079CC2F /* MTAudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTAudioPlayer.h; sourceTree = "<group>"; };
+		188F42D91672C3510079CC2F /* MTAudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTAudioPlayer.m; sourceTree = "<group>"; };
+		188F42E01672C3610079CC2F /* silence.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = silence.wav; sourceTree = "<group>"; };
+		188F42E91672C4700079CC2F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		188F42EB1672C4810079CC2F /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		188F42ED1672C4A10079CC2F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* iPhoneHTTPServerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iPhoneHTTPServerAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* iPhoneHTTPServerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iPhoneHTTPServerAppDelegate.m; sourceTree = "<group>"; };
@@ -114,6 +125,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				188F42EE1672C4A10079CC2F /* AVFoundation.framework in Frameworks */,
+				188F42EC1672C4810079CC2F /* CoreFoundation.framework in Frameworks */,
+				188F42EA1672C4700079CC2F /* AudioToolbox.framework in Frameworks */,
 				DCC3699E1538F08B004C5FA7 /* Security.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
@@ -132,6 +146,8 @@
 				1D3623250D0F684500981E51 /* iPhoneHTTPServerAppDelegate.m */,
 				28D7ACF60DDB3853001CB0EB /* iPhoneHTTPServerViewController.h */,
 				28D7ACF70DDB3853001CB0EB /* iPhoneHTTPServerViewController.m */,
+				188F42D81672C3510079CC2F /* MTAudioPlayer.h */,
+				188F42D91672C3510079CC2F /* MTAudioPlayer.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -172,6 +188,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				188F42E01672C3610079CC2F /* silence.wav */,
 				2899E5210DE3E06400AC0155 /* iPhoneHTTPServerViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* iPhoneHTTPServer-Info.plist */,
@@ -183,6 +200,9 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				188F42ED1672C4A10079CC2F /* AVFoundation.framework */,
+				188F42EB1672C4810079CC2F /* CoreFoundation.framework */,
+				188F42E91672C4700079CC2F /* AudioToolbox.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				288765A40DF7441C002DB57D /* CoreGraphics.framework */,
@@ -352,6 +372,7 @@
 				2899E5220DE3E06400AC0155 /* iPhoneHTTPServerViewController.xib in Resources */,
 				DC540781129F638200195140 /* Web in Resources */,
 				DCC369BA1538F0B1004C5FA7 /* README.txt in Resources */,
+				188F42E11672C3610079CC2F /* silence.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,6 +407,7 @@
 				DCC369B71538F0B1004C5FA7 /* DDTTYLogger.m in Sources */,
 				DCC369B81538F0B1004C5FA7 /* ContextFilterLogFormatter.m in Sources */,
 				DCC369B91538F0B1004C5FA7 /* DispatchQueueLogFormatter.m in Sources */,
+				188F42DD1672C3510079CC2F /* MTAudioPlayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
