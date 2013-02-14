@@ -17,4 +17,6 @@ Now open a browser that supports WebSockets (e.g. Google Chrome or Safari)
 and type in the URL:
 http://localhost:59123
 
+(Replace 59123 with whatever port the server is actually running on.)
+
 Enjoy.
