@@ -280,7 +280,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		result = domain;
 	});
 	
-    return domain;
+    return result;
 }
 
 - (void)setDomain:(NSString *)value
@@ -308,7 +308,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		result = name;
 	});
 	
-	return name;
+	return result;
 }
 
 - (NSString *)publishedName
