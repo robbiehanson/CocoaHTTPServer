@@ -32,7 +32,6 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 	DDLogInfo(@"Setting document root: %@", docRoot);
 	
 	[httpServer setDocumentRoot:docRoot];
-	httpServer.port = 12346;
 	
 	[httpServer setConnectionClass:[MyHTTPConnection class]];
 	
