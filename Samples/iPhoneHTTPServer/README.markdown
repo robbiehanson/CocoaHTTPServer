@@ -4,6 +4,9 @@ This is a bare bones project demonstrating how to embed the CocoaHTTPServer in a
 
 Notice the Web folder. This folder is added to the project as a resource, and the folder itself is copied into the iPhone app. The contents of the folder are set as the document root of the http server.
 
+Critical note: The server is running only while application is in foreground. As soon as you exit from the application (by switching to another app or locking a device) the server will be stopped. The server will be restarted when you enter the application again.
+Read this Apple technical note for the details: http://developer.apple.com/library/ios/#technotes/tn2277/_index.html
+
 INSTRUCTIONS:
 
 Open the Xcode project, and build and go.

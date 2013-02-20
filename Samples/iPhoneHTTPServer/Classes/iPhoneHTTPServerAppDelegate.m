@@ -13,6 +13,21 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 @synthesize window;
 @synthesize viewController;
 
+- (void)startServer
+{
+    // Start the server (and check for problems)
+	
+	NSError *error;
+	if([httpServer start:&error])
+	{
+		DDLogInfo(@"Started HTTP Server on port %hu", [httpServer listeningPort]);
+	}
+	else
+	{
+		DDLogError(@"Error starting HTTP Server: %@", error);
+	}
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Configure our logging framework.
@@ -36,24 +51,28 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 	DDLogInfo(@"Setting document root: %@", webPath);
 	
 	[httpServer setDocumentRoot:webPath];
-	
-	// Start the server (and check for problems)
-	
-	NSError *error;
-	if([httpServer start:&error])
-	{
-		DDLogInfo(@"Started HTTP Server on port %hu", [httpServer listeningPort]);
-	}
-	else
-	{
-		DDLogError(@"Error starting HTTP Server: %@", error);
-	}
-	
+
+    [self startServer];
+    
     // Add the view controller's view to the window and display.
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
-
+    
     return YES;
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [self startServer];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    // There is no public(allowed in AppStore) method for iOS to run continiously in the background for our purposes (serving HTTP).
+    // So, we stop the server when the app is paused (if a users exits from the app or locks a device) and
+    // restart the server when the app is resumed (based on this document: http://developer.apple.com/library/ios/#technotes/tn2277/_index.html )
+    
+    [httpServer stop];
 }
 
 
