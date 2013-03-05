@@ -1,0 +1,3 @@
+[submodule "Vendor/CocoaLumberjack"]
+	path = Vendor/CocoaLumberjack
+	url = https://github.com/robbiehanson/CocoaLumberjack/
