@@ -1,22 +1,13 @@
-//
-//  HTTPErrorResponse.m
-//  ScreenOnWall
-//
-//  Created by Dirk-Willem van Gulik on 04-04-12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
 #import "HTTPErrorResponse.h"
 
 @implementation HTTPErrorResponse
-@synthesize _status = status;
 
 -(id)initWithErrorCode:(int)httpErrorCode
 {
-    if (!(self = [super init]))
-        return nil;
-    
-    _status = httpErrorCode;
+    if ((self = [super init]))
+    {
+        _status = httpErrorCode;
+    }
 
     return self;
 }
