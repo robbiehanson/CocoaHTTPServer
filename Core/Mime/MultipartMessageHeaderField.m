@@ -38,9 +38,9 @@ NSString* extractParamValue(const char* bytes, int length, NSStringEncoding enco
 	params = [[NSMutableDictionary alloc] initWithCapacity:1];
 
 	char* bytes = (char*)data.bytes;
-	int length = data.length;
+	int length = (int)data.length;
 
-	int separatorOffset = findChar(bytes, length, ':');
+	NSUInteger separatorOffset = findChar(bytes, length, ':');
 	if( (-1 == separatorOffset) || (separatorOffset >= length-2) ) {
 		HTTPLogError(@"MultipartFormDataParser: Bad format.No colon in field header.");
 		// tear down

@@ -4,3 +4,6 @@
 *.mode2v3
 xcuserdata
 *~
+
+CocoaHTTPServer/CocoaHTTPServer.xcodeproj/project.xcworkspace/
+/CocoaHTTPServer/build/

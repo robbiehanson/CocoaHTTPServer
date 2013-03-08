@@ -135,6 +135,8 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	#endif
 	
 	[asyncSocket setDelegate:nil delegateQueue:NULL];
+	
+	HTTPStopLogging;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -482,6 +484,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 			[webSockets removeAllObjects];
 			[webSocketsLock unlock];
 		}
+		
 	}});
 }
 
