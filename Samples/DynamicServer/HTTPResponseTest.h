@@ -11,8 +11,8 @@
 {
 	// Parents retain children, children do NOT retain parents
 	
-	HTTPConnection __unsafe_unretained *connection;
-	dispatch_queue_t connectionQueue;
+	__unsafe_unretained HTTPConnection *connection;
+	dispatch_queue_t responseQueue;
 	
 	BOOL readyToSendResponseHeaders;
 }
