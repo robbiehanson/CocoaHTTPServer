@@ -910,7 +910,13 @@ static NSMutableArray *recentNonces;
 		[self handleVersionNotSupported:version];
 		return;
 	}
-	
+
+	BOOL acceptRequest = [self shouldAcceptRequest:request];
+	if (!acceptRequest) {
+		[self handleAuthenticationFailed];
+		return;
+	}
+
 	// Extract requested URI
 	NSString *uri = [self requestURI];
 	
@@ -998,6 +1004,10 @@ static NSMutableArray *recentNonces;
 	}
 	
 	[self sendResponseHeadersAndBody];
+}
+
+- (BOOL)shouldAcceptRequest:(HTTPMessage *)request {
+	return YES;
 }
 
 /**

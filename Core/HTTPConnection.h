@@ -111,6 +111,14 @@
 - (BOOL)shouldDie;
 - (void)die;
 
+// Should the connection accept the request? If the method returns NO, a 401
+// response is sent.
+//
+// request - The request to check.
+//
+// Returns whether the request should be accepted.
+- (BOOL)shouldAcceptRequest:(HTTPMessage *)request;
+
 @end
 
 @interface HTTPConnection (AsynchronousHTTPResponse)
