@@ -1869,6 +1869,54 @@ static NSMutableArray *recentNonces;
 	
 }
 
+- (void)handleLengthRequired
+{
+	// Override me for custom error handling of 411 responses.
+	// If you simply want to add a few extra header fields, see the preprocessErrorResponse: method.
+	// You can also use preprocessErrorResponse: to add an optional HTML body.
+	//
+	// See also: supportsMethod:atPath:
+	
+	HTTPLogWarn(@"HTTP Server: Error 411 - Length Required (%@)", [self requestURI]);
+	
+	// Status code 411 - Length Required
+	HTTPMessage *response = [[HTTPMessage alloc] initResponseWithStatusCode:411 description:nil version:HTTPVersion1_1];
+	[response setHeaderField:@"Content-Length" value:@"0"];
+	[response setHeaderField:@"Connection" value:@"close"];
+	
+	NSData *responseData = [self preprocessErrorResponse:response];
+	[asyncSocket writeData:responseData withTimeout:TIMEOUT_WRITE_ERROR tag:HTTP_FINAL_RESPONSE];
+    
+	
+	// Note: We used the HTTP_FINAL_RESPONSE tag to disconnect after the response is sent.
+	// We do this because the method may include an http body.
+	// Since we can't be sure, we should close the connection.
+}
+
+- (void)handleRequestEntityTooLarge
+{
+	// Override me for custom error handling of 413 responses.
+	// If you simply want to add a few extra header fields, see the preprocessErrorResponse: method.
+	// You can also use preprocessErrorResponse: to add an optional HTML body.
+	//
+	// See also: supportsMethod:atPath:
+	
+	HTTPLogWarn(@"HTTP Server: Error 413 - Request Entity Too Large (%@)", [self requestURI]);
+	
+	// Status code 411 - Length Required
+	HTTPMessage *response = [[HTTPMessage alloc] initResponseWithStatusCode:413 description:nil version:HTTPVersion1_1];
+	[response setHeaderField:@"Content-Length" value:@"0"];
+	[response setHeaderField:@"Connection" value:@"close"];
+	
+	NSData *responseData = [self preprocessErrorResponse:response];
+	[asyncSocket writeData:responseData withTimeout:TIMEOUT_WRITE_ERROR tag:HTTP_FINAL_RESPONSE];
+    
+	
+	// Note: We used the HTTP_FINAL_RESPONSE tag to disconnect after the response is sent.
+	// We do this because the method may include an http body.
+	// Since we can't be sure, we should close the connection.
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Headers
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2075,7 +2123,7 @@ static NSMutableArray *recentNonces;
 						HTTPLogWarn(@"%@[%p]: Method expects request body, but had no specified Content-Length",
 									THIS_FILE, self);
 						
-						[self handleInvalidRequest:nil];
+						[self handleLengthRequired];
 						return;
 					}
 					
@@ -2084,7 +2132,7 @@ static NSMutableArray *recentNonces;
 						HTTPLogWarn(@"%@[%p]: Unable to parse Content-Length header into a valid number",
 									THIS_FILE, self);
 						
-						[self handleInvalidRequest:nil];
+						[self handleLengthRequired];
 						return;
 					}
 				}
@@ -2101,7 +2149,7 @@ static NSMutableArray *recentNonces;
 						HTTPLogWarn(@"%@[%p]: Unable to parse Content-Length header into a valid number",
 									THIS_FILE, self);
 						
-						[self handleInvalidRequest:nil];
+						[self handleRequestEntityTooLarge];
 						return;
 					}
 					
@@ -2110,7 +2158,7 @@ static NSMutableArray *recentNonces;
 						HTTPLogWarn(@"%@[%p]: Method not expecting request body had non-zero Content-Length",
 									THIS_FILE, self);
 						
-						[self handleInvalidRequest:nil];
+						[self handleRequestEntityTooLarge];
 						return;
 					}
 				}

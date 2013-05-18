@@ -102,6 +102,8 @@
 - (void)handleResourceNotFound;
 - (void)handleInvalidRequest:(NSData *)data;
 - (void)handleUnknownMethod:(NSString *)method;
+- (void)handleLengthRequired;
+- (void)handleRequestEntityTooLarge;
 
 - (NSData *)preprocessResponse:(HTTPMessage *)response;
 - (NSData *)preprocessErrorResponse:(HTTPMessage *)response;
