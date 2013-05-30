@@ -163,7 +163,76 @@ static xmlNodePtr _XMLChildWithName(xmlNodePtr child, const xmlChar* name) {
       _data = [xmlString dataUsingEncoding:NSUTF8StringEncoding];
       _status = 207;
     }
-    
+
+    // 9.2 PROPPATCH Method - for Microsoft Windows support
+    if ([method isEqualToString:@"PROPPATCH"]) {
+        NSString* basePath = [rootPath stringByAppendingPathComponent:resourcePath];
+        BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:basePath];
+        if (!exists) {
+            _status = 404;
+        } else {
+            NSMutableDictionary *properties = [NSMutableDictionary dictionary];
+            xmlDocPtr document = xmlReadMemory(body.bytes, (int)body.length, NULL, NULL, kXMLParseOptions);
+            if (document) {
+                xmlNodePtr node = _XMLChildWithName(document->children, (const xmlChar*)"propertyupdate");
+                if (node) {
+                    node = _XMLChildWithName(node->children, (const xmlChar*)"set");
+                }
+                if (node) {
+                    node = _XMLChildWithName(node->children, (const xmlChar*)"prop");
+                }
+                if (node) {
+                    node = node->children;
+                    while (node) {
+                        if (!xmlStrcmp(node->name, (const xmlChar*)"Win32CreationTime")) {
+                            if (node && node->children && node->children->content) {
+                                NSString *cTimeStr = [NSString stringWithUTF8String:(const char*)node->children->content];
+                                NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                [df setFormatterBehavior:NSDateFormatterBehavior10_4];
+                                [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
+                                [df setDateFormat:@"EEE, dd MMM y HH:mm:ss 'GMT'"];
+                                NSDate *cDate = [df dateFromString:cTimeStr];
+                                [properties setObject:cDate forKey:NSFileCreationDate];
+                            }
+                        } else if (!xmlStrcmp(node->name, (const xmlChar*)"Win32LastModifiedTime")) {
+                            if (node && node->children && node->children->content) {
+                                NSString *mTimeStr = [NSString stringWithUTF8String:(const char*)node->children->content];
+                                NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                [df setFormatterBehavior:NSDateFormatterBehavior10_4];
+                                [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
+                                [df setDateFormat:@"EEE, dd MMM y HH:mm:ss 'GMT'"];
+                                NSDate *mDate = [df dateFromString:mTimeStr];
+                                [properties setObject:mDate forKey:NSFileModificationDate];
+                            }
+                        } else {
+                            HTTPLogWarn(@"Unknown DAV property requested \"%s\"", node->name);
+                        }
+                        node = node->next;
+                    }
+                } else {
+                    HTTPLogWarn(@"HTTP Server: Invalid DAV properties\n%@", [[NSString alloc] initWithData:body encoding:NSUTF8StringEncoding]);
+                }
+                xmlFreeDoc(document);
+            }
+            
+            if (properties.count)
+            {
+                [[NSFileManager defaultManager] setAttributes:properties ofItemAtPath:basePath error:nil];
+            }
+            
+            NSMutableString* xmlString = [NSMutableString stringWithString:@"<?xml version=\"1.0\" encoding=\"utf-8\" ?>"];
+            [xmlString appendString:@"<D:multistatus xmlns:D=\"DAV:\">\n"];
+            if (![resourcePath hasPrefix:@"/"]) {
+                resourcePath = [@"/" stringByAppendingString:resourcePath];
+            }
+            [xmlString appendString:@"</D:multistatus>"];
+            
+            [_headers setObject:@"application/xml; charset=\"utf-8\"" forKey:@"Content-Type"];
+            _data = [xmlString dataUsingEncoding:NSUTF8StringEncoding];
+            _status = 200;
+        }
+    }
+
     // 9.3 MKCOL Method
     if ([method isEqualToString:@"MKCOL"]) {
       NSString* path = [rootPath stringByAppendingPathComponent:resourcePath];

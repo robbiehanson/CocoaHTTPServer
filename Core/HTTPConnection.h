@@ -15,7 +15,11 @@
 
 @interface HTTPConfig : NSObject
 {
+#if __has_feature(objc_arc_weak)
+	HTTPServer __weak *server;
+#else
 	HTTPServer __unsafe_unretained *server;
+#endif
 	NSString __strong *documentRoot;
 	dispatch_queue_t queue;
 }
@@ -23,7 +27,11 @@
 - (id)initWithServer:(HTTPServer *)server documentRoot:(NSString *)documentRoot;
 - (id)initWithServer:(HTTPServer *)server documentRoot:(NSString *)documentRoot queue:(dispatch_queue_t)q;
 
+#if __has_feature(objc_arc_weak)
+@property (nonatomic, weak, readonly) HTTPServer *server;
+#else
 @property (nonatomic, unsafe_unretained, readonly) HTTPServer *server;
+#endif
 @property (nonatomic, strong, readonly) NSString *documentRoot;
 @property (nonatomic, readonly) dispatch_queue_t queue;
 
