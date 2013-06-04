@@ -73,6 +73,7 @@
 
 - (BOOL)supportsMethod:(NSString *)method atPath:(NSString *)path;
 - (BOOL)expectsRequestBodyFromMethod:(NSString *)method atPath:(NSString *)path;
+- (BOOL)acceptsRequestBodyWithContentLength:(UInt64)contentLength;
 
 - (BOOL)isSecureServer;
 - (NSArray *)sslIdentityAndCertificates;

@@ -294,6 +294,14 @@ static NSMutableArray *recentNonces;
 	return NO;
 }
 
+/**
+ * Returns whether or not the server accepts a given content length.
+**/
+- (BOOL)acceptsRequestBodyWithContentLength:(UInt64)contentLength
+{
+	return YES;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark HTTPS
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1879,7 +1887,6 @@ static NSMutableArray *recentNonces;
 	
 	HTTPLogWarn(@"HTTP Server: Error 411 - Length Required (%@)", [self requestURI]);
 	
-	// Status code 411 - Length Required
 	HTTPMessage *response = [[HTTPMessage alloc] initResponseWithStatusCode:411 description:nil version:HTTPVersion1_1];
 	[response setHeaderField:@"Content-Length" value:@"0"];
 	[response setHeaderField:@"Connection" value:@"close"];
@@ -1903,14 +1910,13 @@ static NSMutableArray *recentNonces;
 	
 	HTTPLogWarn(@"HTTP Server: Error 413 - Request Entity Too Large (%@)", [self requestURI]);
 	
-	// Status code 411 - Length Required
 	HTTPMessage *response = [[HTTPMessage alloc] initResponseWithStatusCode:413 description:nil version:HTTPVersion1_1];
 	[response setHeaderField:@"Content-Length" value:@"0"];
 	[response setHeaderField:@"Connection" value:@"close"];
 	
 	NSData *responseData = [self preprocessErrorResponse:response];
 	[asyncSocket writeData:responseData withTimeout:TIMEOUT_WRITE_ERROR tag:HTTP_FINAL_RESPONSE];
-    
+
 	
 	// Note: We used the HTTP_FINAL_RESPONSE tag to disconnect after the response is sent.
 	// We do this because the method may include an http body.
@@ -2133,6 +2139,13 @@ static NSMutableArray *recentNonces;
 									THIS_FILE, self);
 						
 						[self handleLengthRequired];
+						return;
+					}
+					
+					BOOL acceptsContentLength = [self acceptsRequestBodyWithContentLength:requestContentLength];
+					if(!acceptsContentLength)
+					{
+						[self handleRequestEntityTooLarge];
 						return;
 					}
 				}
