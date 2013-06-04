@@ -221,7 +221,7 @@ static NSMutableArray *recentNonces;
 	HTTPLogTrace();
 	
 	#if !OS_OBJECT_USE_OBJC
-	dispatch_release(connectionQueue);
+	if (connectionQueue) dispatch_release(connectionQueue);
 	#endif
 	
 	[asyncSocket setDelegate:nil delegateQueue:NULL];
