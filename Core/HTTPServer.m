@@ -568,7 +568,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	if (type)
 	{
 		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:[asyncSocket localPort]];
-		[netService setDelegate:self];
+		netService.delegate = self;
 		
 		NSNetService *theNetService = netService;
 		NSData *txtRecordData = nil;
@@ -576,8 +576,6 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 			txtRecordData = [NSNetService dataFromTXTRecordDictionary:txtRecordDictionary];
 		
 		dispatch_block_t bonjourBlock = ^{
-			
-			[theNetService removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 			[theNetService scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 			[theNetService publish];
 			
@@ -603,10 +601,11 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	if (netService)
 	{
 		NSNetService *theNetService = netService;
+        netService.delegate = nil;
 		
 		dispatch_block_t bonjourBlock = ^{
-			
 			[theNetService stop];
+            [theNetService removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 		};
 		
 		[[self class] performBonjourBlock:bonjourBlock];
