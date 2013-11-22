@@ -819,7 +819,7 @@ static NSMutableArray *recentNonces;
 				// r2 is the number of ending bytes to include in the range
 				
 				if(!hasR2) return NO;
-				if(r2 > contentLength) return NO;
+				if(r2 > contentLength) r2 = contentLength;
 				
 				UInt64 startIndex = contentLength - r2;
 				
@@ -842,7 +842,7 @@ static NSMutableArray *recentNonces;
 				// Note: The range is inclusive. So 0-1 has a length of 2 bytes.
 				
 				if(r1 > r2) return NO;
-				if(r2 >= contentLength) return NO;
+				if(r2 >= contentLength) r2 = contentLength - 1;
 				
 				[ranges addObject:[NSValue valueWithDDRange:DDMakeRange(r1, r2 - r1 + 1)]];
 			}
