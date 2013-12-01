@@ -1,4 +1,3 @@
-
 #import "MultipartFormDataParser.h"
 #import "DDData.h"
 #import "HTTPLogging.h"
@@ -417,7 +416,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 }
 
 
-- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(int) length encoding:(int) encoding {
+- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(NSUInteger) length encoding:(int) encoding {
 	// If we have BASE64 or Quoted-Printable encoded data, we have to be sure
 	// we don't break the format.
 	int sizeToLeavePending = 0;
