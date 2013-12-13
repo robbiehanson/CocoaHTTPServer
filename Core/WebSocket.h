@@ -19,7 +19,11 @@
 	BOOL isOpen;
 	BOOL isVersion76;
 	
+#if __has_feature(objc_arc_weak)
+	id __weak delegate;
+#else
 	id __unsafe_unretained delegate;
+#endif
 }
 
 + (BOOL)isWebSocketRequest:(HTTPMessage *)request;
@@ -32,7 +36,11 @@
  * In most cases it will be easier to subclass WebSocket,
  * but some circumstances may lead one to prefer standard delegate callbacks instead.
 **/
+#if __has_feature(objc_arc_weak)
+@property (/* atomic */ weak) id delegate;
+#else
 @property (/* atomic */ unsafe_unretained) id delegate;
+#endif
 
 /**
  * The WebSocket class is thread-safe, generally via it's GCD queue.
