@@ -263,6 +263,9 @@ static NSMutableArray *recentNonces;
 	
 	if ([method isEqualToString:@"HEAD"])
 		return YES;
+	
+	if ([method isEqualToString:@"OPTIONS"])
+		return YES;
 		
 	return NO;
 }
