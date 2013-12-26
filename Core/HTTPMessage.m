@@ -48,14 +48,21 @@
 	}
 }
 
+-(BOOL)booleanToBool:( Boolean )value
+{
+    BOOL result = ( 0 == value ) ? NO : YES;
+    return result;
+}
+
 - (BOOL)appendData:(NSData *)data
 {
-	return CFHTTPMessageAppendBytes(message, [data bytes], [data length]);
+    CFIndex cfDataLength = (CFIndex)[data length];
+	return [ self booleanToBool: CFHTTPMessageAppendBytes(message, [data bytes], cfDataLength) ];
 }
 
 - (BOOL)isHeaderComplete
 {
-	return CFHTTPMessageIsHeaderComplete(message);
+	return [ self booleanToBool: CFHTTPMessageIsHeaderComplete(message) ];
 }
 
 - (NSString *)version

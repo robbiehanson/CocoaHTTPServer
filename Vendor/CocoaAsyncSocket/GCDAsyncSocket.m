@@ -411,7 +411,11 @@ enum GCDAsyncSocketConfig
 
 - (void)ensureCapacityForWrite:(size_t)numBytes
 {
-	size_t availableSpace = preBufferSize - (writePointer - readPointer);
+    ssize_t pointerDiff = (writePointer - readPointer);
+    NSParameterAssert( pointerDiff >= 0 );
+    NSParameterAssert( preBufferSize >= (size_t)pointerDiff );
+    
+	size_t availableSpace = preBufferSize - (size_t)pointerDiff;
 	
 	if (numBytes > availableSpace)
 	{
@@ -420,8 +424,8 @@ enum GCDAsyncSocketConfig
 		size_t newPreBufferSize = preBufferSize + additionalBytes;
 		uint8_t *newPreBuffer = realloc(preBuffer, newPreBufferSize);
 		
-		size_t readPointerOffset = readPointer - preBuffer;
-		size_t writePointerOffset = writePointer - preBuffer;
+		ssize_t readPointerOffset = readPointer - preBuffer;
+		ssize_t writePointerOffset = writePointer - preBuffer;
 		
 		preBuffer = newPreBuffer;
 		preBufferSize = newPreBufferSize;
@@ -433,7 +437,8 @@ enum GCDAsyncSocketConfig
 
 - (size_t)availableBytes
 {
-	return writePointer - readPointer;
+    ssize_t result = writePointer - readPointer;
+	return (size_t)result;
 }
 
 - (uint8_t *)readBuffer
@@ -441,10 +446,14 @@ enum GCDAsyncSocketConfig
 	return readPointer;
 }
 
-- (void)getReadBuffer:(uint8_t **)bufferPtr availableBytes:(size_t *)availableBytesPtr
+- (void)getReadBuffer:(uint8_t **)bufferPtr
+       availableBytes:(size_t *)availableBytesPtr
 {
 	if (bufferPtr) *bufferPtr = readPointer;
-	if (availableBytesPtr) *availableBytesPtr = writePointer - readPointer;
+	if (availableBytesPtr)
+    {
+        *availableBytesPtr = [ self availableBytes ];
+    }
 }
 
 - (void)didRead:(size_t)bytesRead
@@ -461,7 +470,8 @@ enum GCDAsyncSocketConfig
 
 - (size_t)availableSpace
 {
-	return preBufferSize - (writePointer - readPointer);
+    size_t result = preBufferSize - [ self availableBytes ];
+	return result;
 }
 
 - (uint8_t *)writeBuffer
@@ -472,7 +482,10 @@ enum GCDAsyncSocketConfig
 - (void)getWriteBuffer:(uint8_t **)bufferPtr availableSpace:(size_t *)availableSpacePtr
 {
 	if (bufferPtr) *bufferPtr = writePointer;
-	if (availableSpacePtr) *availableSpacePtr = preBufferSize - (writePointer - readPointer);
+	if (availableSpacePtr)
+    {
+        *availableSpacePtr = preBufferSize - [ self availableBytes ];
+    }
 }
 
 - (void)didWrite:(size_t)bytesWritten
@@ -892,7 +905,9 @@ enum GCDAsyncSocketConfig
 			
 			if (memcmp(pre, termBuf, termLength) == 0)
 			{
-				NSUInteger preOffset = pre - [preBuffer readBuffer]; // pointer arithmetic
+                 // pointer arithmetic
+                ssize_t pointerDiff = pre - [preBuffer readBuffer];
+				NSUInteger preOffset = (NSUInteger)pointerDiff;
 				
 				result = preOffset + termLength;
 				found = YES;
@@ -930,21 +945,22 @@ enum GCDAsyncSocketConfig
 	// See the above method for a discussion of the algorithm used here.
 	
 	uint8_t *buff = [buffer mutableBytes];
-	NSUInteger buffLength = bytesDone + numBytes;
+	ssize_t buffLength = (ssize_t)self->bytesDone + numBytes;
 	
 	const void *termBuff = [term bytes];
-	NSUInteger termLength = [term length];
+	ssize_t termLength = (ssize_t)[term length];
 	
 	// Note: We are dealing with unsigned integers,
 	// so make sure the math doesn't go below zero.
 	
-	NSUInteger i = ((buffLength - numBytes) >= termLength) ? (buffLength - numBytes - termLength + 1) : 0;
+	ssize_t i = ((buffLength - numBytes) >= termLength) ? (buffLength - numBytes - termLength + 1) : 0;
 	
 	while (i + termLength <= buffLength)
 	{
 		uint8_t *subBuffer = buff + startOffset + i;
-		
-		if (memcmp(subBuffer, termBuff, termLength) == 0)
+		size_t castedTermLength = (size_t)termLength;
+        
+		if (memcmp(subBuffer, termBuff, castedTermLength) == 0)
 		{
 			return buffLength - (i + termLength);
 		}
@@ -1311,7 +1327,7 @@ enum GCDAsyncSocketConfig
 		__block BOOL result;
 		
 		dispatch_sync(socketQueue, ^{
-			result = ((config & kIPv4Disabled) == 0);
+			result = ((self->config & (uint16_t)kIPv4Disabled) == 0);
 		});
 		
 		return result;
@@ -1325,9 +1341,9 @@ enum GCDAsyncSocketConfig
 	dispatch_block_t block = ^{
 		
 		if (flag)
-			config &= ~kIPv4Disabled;
+			self->config &= (uint16_t)~kIPv4Disabled;
 		else
-			config |= kIPv4Disabled;
+			self->config |= (uint16_t)kIPv4Disabled;
 	};
 	
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -1349,7 +1365,7 @@ enum GCDAsyncSocketConfig
 		__block BOOL result;
 		
 		dispatch_sync(socketQueue, ^{
-			result = ((config & kIPv6Disabled) == 0);
+			result = ((self->config & (uint16_t)kIPv6Disabled) == 0);
 		});
 		
 		return result;
@@ -1363,9 +1379,9 @@ enum GCDAsyncSocketConfig
 	dispatch_block_t block = ^{
 		
 		if (flag)
-			config &= ~kIPv6Disabled;
+			self->config &= ~kIPv6Disabled;
 		else
-			config |= kIPv6Disabled;
+			self->config |= kIPv6Disabled;
 	};
 	
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -1656,9 +1672,10 @@ enum GCDAsyncSocketConfig
 		
 		if (enableIPv4)
 		{
-			accept4Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socket4FD, 0, socketQueue);
+            uintptr_t dispatchSocket4FD = (uintptr_t)self->socket4FD;
+			self->accept4Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, dispatchSocket4FD, 0, self->socketQueue);
 			
-			int socketFD = socket4FD;
+			int socketFD = (int)self->socket4FD;
 			dispatch_source_t acceptSource = accept4Source;
 			
 			dispatch_source_set_event_handler(accept4Source, ^{ @autoreleasepool {
@@ -1690,9 +1707,10 @@ enum GCDAsyncSocketConfig
 		
 		if (enableIPv6)
 		{
-			accept6Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socket6FD, 0, socketQueue);
+            uintptr_t dispatchAccept6FD = (uintptr_t)self->socket6FD;
+			self->accept6Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, dispatchAccept6FD, 0ul, self->socketQueue);
 			
-			int socketFD = socket6FD;
+			int socketFD = (int)self->socket6FD;
 			dispatch_source_t acceptSource = accept6Source;
 			
 			dispatch_source_set_event_handler(accept6Source, ^{ @autoreleasepool {
@@ -2609,7 +2627,8 @@ enum GCDAsyncSocketConfig
 		});
 		#endif
 		
-		dispatch_time_t tt = dispatch_time(DISPATCH_TIME_NOW, (timeout * NSEC_PER_SEC));
+        int64_t interval = (int64_t)(timeout * NSEC_PER_SEC);
+		dispatch_time_t tt = dispatch_time(DISPATCH_TIME_NOW, interval);
 		dispatch_source_set_timer(connectTimer, tt, DISPATCH_TIME_FOREVER, 0);
 		
 		dispatch_resume(connectTimer);
@@ -3638,8 +3657,10 @@ enum GCDAsyncSocketConfig
 
 - (void)setupReadAndWriteSourcesForNewlyConnectedSocket:(int)socketFD
 {
-	readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socketFD, 0, socketQueue);
-	writeSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, socketFD, 0, socketQueue);
+    uintptr_t dispatchSocketFD = (uintptr_t)socketFD;
+    
+	readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, dispatchSocketFD, 0, socketQueue);
+	writeSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, dispatchSocketFD, 0, socketQueue);
 	
 	// Setup event handlers
 	
@@ -3709,7 +3730,7 @@ enum GCDAsyncSocketConfig
 	// But we should be able to write immediately.
 	
 	socketFDBytesAvailable = 0;
-	flags &= ~kReadSourceSuspended;
+	flags &= (uint32_t)~kReadSourceSuspended;
 	
 	LogVerbose(@"dispatch_resume(readSource)");
 	dispatch_resume(readSource);
@@ -3766,7 +3787,7 @@ enum GCDAsyncSocketConfig
 		LogVerbose(@"dispatch_resume(readSource)");
 		
 		dispatch_resume(readSource);
-		flags &= ~kReadSourceSuspended;
+		flags &= (uint32_t)~kReadSourceSuspended;
 	}
 }
 
@@ -5601,7 +5622,7 @@ enum GCDAsyncSocketConfig
 		}
 		else
 		{
-			bytesWritten = result;
+			bytesWritten = (size_t)result;
 		}
 	}
 	
@@ -5616,7 +5637,7 @@ enum GCDAsyncSocketConfig
 	
 	if (waiting)
 	{
-		flags &= ~kSocketCanAcceptBytes;
+		flags &= (uint32_t)~kSocketCanAcceptBytes;
 		
 		if (![self usingCFStreamForTLS])
 		{
@@ -6022,7 +6043,7 @@ enum GCDAsyncSocketConfig
 		}
 		else
 		{
-			size_t bytesReadFromSocket = result;
+			size_t bytesReadFromSocket = (size_t)result;
 			
 			if (socketFDBytesAvailable > bytesReadFromSocket)
 				socketFDBytesAvailable -= bytesReadFromSocket;

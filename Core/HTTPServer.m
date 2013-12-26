@@ -51,22 +51,22 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		dispatch_queue_set_specific(connectionQueue, IsOnConnectionQueueKey, nonNullUnusedPointer, NULL);
 		
 		// Initialize underlying GCD based tcp socket
-		asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:serverQueue];
+		self->asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:serverQueue];
 		
 		// Use default connection class of HTTPConnection
-		connectionClass = [HTTPConnection self];
+		self->connectionClass = [HTTPConnection self];
 		
 		// By default bind on all available interfaces, en1, wifi etc
-		interface = nil;
+		self->interface = nil;
 		
-		// Use a default port of 0
-		// This will allow the kernel to automatically pick an open port for us
-		port = 0;
+		// Use a default self->port of 0
+		// This will allow the kernel to automatically pick an open self->port for us
+		self->port = 0;
 		
 		// Configure default values for bonjour service
 		
-		// Bonjour domain. Use the local domain by default
-		domain = @"local.";
+		// Bonjour self->domain. Use the local self->domain by default
+		self->domain = @"local.";
 		
 		// If using an empty string ("") for the service name when registering,
 		// the system will automatically use the "Computer Name".
@@ -93,7 +93,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		                                             name:WebSocketDidDieNotification
 		                                           object:nil];
 		
-		isRunning = NO;
+		self->isRunning = NO;
 	}
 	return self;
 }
@@ -119,7 +119,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	dispatch_release(connectionQueue);
 	#endif
 	
-	[asyncSocket setDelegate:nil delegateQueue:NULL];
+	[self->asyncSocket setDelegate:nil delegateQueue:NULL];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = documentRoot;
+		result = self->documentRoot;
 	});
 	
 	return result;
@@ -159,7 +159,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	NSString *valueCopy = [value copy];
 	
 	dispatch_async(serverQueue, ^{
-		documentRoot = valueCopy;
+		self->documentRoot = valueCopy;
 	});
 	
 }
@@ -175,7 +175,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block Class result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = connectionClass;
+		result = self->connectionClass;
 	});
 	
 	return result;
@@ -186,7 +186,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	HTTPLogTrace();
 	
 	dispatch_async(serverQueue, ^{
-		connectionClass = value;
+		self->connectionClass = value;
 	});
 }
 
@@ -198,7 +198,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = interface;
+		result = self->interface;
 	});
 	
 	return result;
@@ -209,7 +209,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	NSString *valueCopy = [value copy];
 	
 	dispatch_async(serverQueue, ^{
-		interface = valueCopy;
+		self->interface = valueCopy;
 	});
 	
 }
@@ -217,14 +217,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 /**
  * The port to listen for connections on.
  * By default this port is initially set to zero, which allows the kernel to pick an available port for us.
- * After the HTTP server has started, the port being used may be obtained by this method.
+ * After the HTTP server has started, the self->port being used may be obtained by this method.
 **/
 - (UInt16)port
 {
 	__block UInt16 result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = port;
+		result = self->port;
 	});
 	
     return result;
@@ -235,8 +235,8 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block UInt16 result;
 	
 	dispatch_sync(serverQueue, ^{
-		if (isRunning)
-			result = [asyncSocket localPort];
+		if (self->isRunning)
+			result = [self->asyncSocket localPort];
 		else
 			result = 0;
 	});
@@ -249,7 +249,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	HTTPLogTrace();
 	
 	dispatch_async(serverQueue, ^{
-		port = value;
+		self->port = value;
 	});
 }
 
@@ -262,7 +262,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = domain;
+		result = self->domain;
 	});
 	
     return result;
@@ -275,7 +275,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	NSString *valueCopy = [value copy];
 	
 	dispatch_async(serverQueue, ^{
-		domain = valueCopy;
+		self->domain = valueCopy;
 	});
 	
 }
@@ -290,7 +290,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = name;
+		result = self->name;
 	});
 	
 	return result;
@@ -302,7 +302,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	dispatch_sync(serverQueue, ^{
 		
-		if (netService == nil)
+		if (self->netService == nil)
 		{
 			result = nil;
 		}
@@ -310,7 +310,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		{
 			
 			dispatch_block_t bonjourBlock = ^{
-				result = [[netService name] copy];
+				result = [[self->netService name] copy];
 			};
 			
 			[[self class] performBonjourBlock:bonjourBlock];
@@ -325,7 +325,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	NSString *valueCopy = [value copy];
 	
 	dispatch_async(serverQueue, ^{
-		name = valueCopy;
+		self->name = valueCopy;
 	});
 	
 }
@@ -339,7 +339,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = type;
+		result = self->type;
 	});
 	
 	return result;
@@ -350,7 +350,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	NSString *valueCopy = [value copy];
 	
 	dispatch_async(serverQueue, ^{
-		type = valueCopy;
+		self->type = valueCopy;
 	});
 	
 }
@@ -363,7 +363,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block NSDictionary *result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = txtRecordDictionary;
+		result = self->txtRecordDictionary;
 	});
 	
 	return result;
@@ -377,15 +377,15 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	dispatch_async(serverQueue, ^{
 	
-		txtRecordDictionary = valueCopy;
+		self->txtRecordDictionary = valueCopy;
 		
 		// Update the txtRecord of the netService if it has already been published
-		if (netService)
+		if (self->netService)
 		{
-			NSNetService *theNetService = netService;
+			NSNetService *theNetService = self->netService;
 			NSData *txtRecordData = nil;
-			if (txtRecordDictionary)
-				txtRecordData = [NSNetService dataFromTXTRecordDictionary:txtRecordDictionary];
+			if (self->txtRecordDictionary)
+				txtRecordData = [NSNetService dataFromTXTRecordDictionary:self->txtRecordDictionary];
 			
 			dispatch_block_t bonjourBlock = ^{
 				[theNetService setTXTRecordData:txtRecordData];
@@ -410,12 +410,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	dispatch_sync(serverQueue, ^{ @autoreleasepool {
 		
-		success = [asyncSocket acceptOnInterface:interface port:port error:&err];
+		success = [self->asyncSocket acceptOnInterface:self->interface
+                                                  port:self->port
+                                                 error:&err];
 		if (success)
 		{
-			HTTPLogInfo(@"%@: Started HTTP server on port %hu", THIS_FILE, [asyncSocket localPort]);
+			HTTPLogInfo(@"%@: Started HTTP server on self->port %hu", THIS_FILE, [self->asyncSocket localPort]);
 			
-			isRunning = YES;
+			self->isRunning = YES;
 			[self publishBonjour];
 		}
 		else
@@ -445,28 +447,28 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		[self unpublishBonjour];
 		
 		// Stop listening / accepting incoming connections
-		[asyncSocket disconnect];
-		isRunning = NO;
+		[self->asyncSocket disconnect];
+		self->isRunning = NO;
 		
 		if (!keepExistingConnections)
 		{
 			// Stop all HTTP connections the server owns
-			[connectionsLock lock];
-			for (HTTPConnection *connection in connections)
+			[self->connectionsLock lock];
+			for (HTTPConnection *connection in self->connections)
 			{
 				[connection stop];
 			}
-			[connections removeAllObjects];
-			[connectionsLock unlock];
+			[self->connections removeAllObjects];
+			[self->connectionsLock unlock];
 			
 			// Stop all WebSocket connections the server owns
-			[webSocketsLock lock];
-			for (WebSocket *webSocket in webSockets)
+			[self->webSocketsLock lock];
+			for (WebSocket *webSocket in self->webSockets)
 			{
 				[webSocket stop];
 			}
-			[webSockets removeAllObjects];
-			[webSocketsLock unlock];
+			[self->webSockets removeAllObjects];
+			[self->webSocketsLock unlock];
 		}
 	}});
 }
@@ -476,7 +478,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block BOOL result;
 	
 	dispatch_sync(serverQueue, ^{
-		result = isRunning;
+		result = self->isRunning;
 	});
 	
 	return result;
@@ -539,14 +541,16 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	// Then benchmark it before and after and discover for yourself the shocking truth!
 	// 
 	// Try the apache benchmark tool (already installed on your Mac):
-	// $  ab -n 1000 -c 1 http://localhost:<port>/some_path.html
+	// $  ab -n 1000 -c 1 http://localhost:<self->port>/some_path.html
 	
-	return [[HTTPConfig alloc] initWithServer:self documentRoot:documentRoot queue:connectionQueue];
+	return [[HTTPConfig alloc] initWithServer:self
+                                 documentRoot:self->documentRoot
+                                        queue:connectionQueue];
 }
 
 - (void)socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
 {
-	HTTPConnection *newConnection = (HTTPConnection *)[[connectionClass alloc] initWithAsyncSocket:newSocket
+	HTTPConnection *newConnection = (HTTPConnection *)[[self->connectionClass alloc] initWithAsyncSocket:newSocket
 	                                                                                 configuration:[self config]];
 	[connectionsLock lock];
 	[connections addObject:newConnection];
@@ -567,7 +571,10 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	if (type)
 	{
-		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:[asyncSocket localPort]];
+		netService = [[NSNetService alloc] initWithDomain:self->domain
+                                                     type:type
+                                                     name:name
+                                                     port:[self->asyncSocket localPort]];
 		[netService setDelegate:self];
 		
 		NSNetService *theNetService = netService;
@@ -640,7 +647,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	// 
 	// Note: This method is invoked on our bonjour thread.
 	
-	HTTPLogInfo(@"Bonjour Service Published: domain(%@) type(%@) name(%@)", [ns domain], [ns type], [ns name]);
+	HTTPLogInfo(@"Bonjour Service Published: self->domain(%@) type(%@) name(%@)", [ns domain], [ns type], [ns name]);
 }
 
 /**
@@ -653,7 +660,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	// 
 	// Note: This method in invoked on our bonjour thread.
 	
-	HTTPLogWarn(@"Failed to Publish Service: domain(%@) type(%@) name(%@) - %@",
+	HTTPLogWarn(@"Failed to Publish Service: self->domain(%@) type(%@) name(%@) - %@",
 	                                         [ns domain], [ns type], [ns name], errorDict);
 }
 

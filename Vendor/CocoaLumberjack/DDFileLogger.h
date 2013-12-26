@@ -69,7 +69,7 @@
  * 
  * You may optionally disable deleting old/rolled/archived log files by setting this property to zero.
 **/
-@property (readwrite, assign) NSUInteger maximumNumberOfLogFiles;
+@property (atomic, readwrite, assign) NSUInteger maximumNumberOfLogFiles;
 
 // Public methods
 

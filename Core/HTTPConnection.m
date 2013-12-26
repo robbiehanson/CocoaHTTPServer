@@ -139,8 +139,10 @@ static NSMutableArray *recentNonces;
 		[recentNonces addObject:newNonce];
 	}});
 	
-	double delayInSeconds = TIMEOUT_NONCE;
-	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+	uint64_t delayInSeconds = TIMEOUT_NONCE;
+    int64_t delay = (int64_t)(delayInSeconds * NSEC_PER_SEC);
+    
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delay);
 	dispatch_after(popTime, recentNonceQueue, ^{ @autoreleasepool {
 		
 		[recentNonces removeObject:newNonce];
