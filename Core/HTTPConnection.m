@@ -238,11 +238,23 @@ static NSMutableArray *recentNonces;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Returns the set of methods supported at a particular URI.
+**/
+- (NSSet *)supportedMethodsAtPath:(NSString *)path
+{
+	HTTPLogTrace();
+	
+	return [NSSet setWithObjects:@"GET", @"HEAD", @"OPTIONS", nil];
+}
+
+/**
  * Returns whether or not the server will accept messages of a given method
  * at a particular URI.
 **/
 - (BOOL)supportsMethod:(NSString *)method atPath:(NSString *)path
 {
+	NSParameterAssert(method != nil);
+	
 	HTTPLogTrace();
 	
 	// Override me to support methods such as POST.
@@ -251,23 +263,14 @@ static NSMutableArray *recentNonces;
 	// - Does the given path represent a resource that is designed to accept this method?
 	// - If accepting an upload, is the size of the data being uploaded too big?
 	//   To do this you can check the requestContentLength variable.
-	// 
+	//
 	// For more information, you can always access the HTTPMessage request variable.
-	// 
+	//
 	// You should fall through with a call to [super supportsMethod:method atPath:path]
-	// 
+	//
 	// See also: expectsRequestBodyFromMethod:atPath:
 	
-	if ([method isEqualToString:@"GET"])
-		return YES;
-	
-	if ([method isEqualToString:@"HEAD"])
-		return YES;
-	
-	if ([method isEqualToString:@"OPTIONS"])
-		return YES;
-		
-	return NO;
+	return [[self supportedMethodsAtPath:path] containsObject:method];
 }
 
 /**
@@ -1836,7 +1839,7 @@ static NSMutableArray *recentNonces;
 }
 
 /**
- * Called if we receive a HTTP request with a method other than GET or HEAD.
+ * Called if we receive a HTTP request with a method other than GET, HEAD, or OPTIONS.
 **/
 - (void)handleUnknownMethod:(NSString *)method
 {
@@ -1941,6 +1944,11 @@ static NSMutableArray *recentNonces;
 	
 	// Add server capability headers
 	[response setHeaderField:@"Accept-Ranges" value:@"bytes"];
+	
+	if ([request.method isEqual:@"OPTIONS"])
+	{
+		[response setHeaderField:@"Allow" value:@"GET, HEAD, OPTIONS"];
+	}
 	
 	// Add optional response headers
 	if ([httpResponse respondsToSelector:@selector(httpHeaders)])
