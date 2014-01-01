@@ -46,7 +46,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		filePath = [fpath copy];
 		if (filePath == nil)
 		{
-			HTTPLogWarn(@"%@: Init failed - Nil filePath", THIS_FILE);
+			HTTPLogWarn(@"%@: Manque de L'Init- Nil filePath", THIS_FILE);
 			
 			return nil;
 		}
@@ -54,7 +54,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:NULL];
 		if (fileAttributes == nil)
 		{
-			HTTPLogWarn(@"%@: Init failed - Unable to get file attributes. filePath: %@", THIS_FILE, filePath);
+			HTTPLogWarn(@"%@: Manque de L'Init - impossible d'obtenir les attributs de fichier. filePath: %@", THIS_FILE, filePath);
 			
 			return nil;
 		}
@@ -101,7 +101,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 {
 	if (!readSourceSuspended)
 	{
-		HTTPLogVerbose(@"%@[%p]: Suspending readSource", THIS_FILE, self);
+		HTTPLogVerbose(@"%@[%p]: suspension readSource", THIS_FILE, self);
 		
 		readSourceSuspended = YES;
 		dispatch_suspend(readSource);
@@ -112,7 +112,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 {
 	if (readSourceSuspended)
 	{
-		HTTPLogVerbose(@"%@[%p]: Resuming readSource", THIS_FILE, self);
+		HTTPLogVerbose(@"%@[%p]: Reprise readSource", THIS_FILE, self);
 		
 		readSourceSuspended = NO;
 		dispatch_resume(readSource);
@@ -121,7 +121,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 
 - (void)cancelReadSource
 {
-	HTTPLogVerbose(@"%@[%p]: Canceling readSource", THIS_FILE, self);
+	HTTPLogVerbose(@"%@[%p]: Annulation  readSource", THIS_FILE, self);
 	
 	dispatch_source_cancel(readSource);
 	
@@ -142,12 +142,12 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	fileFD = open([filePath UTF8String], (O_RDONLY | O_NONBLOCK));
 	if (fileFD == NULL_FD)
 	{
-		HTTPLogError(@"%@: Unable to open file. filePath: %@", THIS_FILE, filePath);
+		HTTPLogError(@"%@: Impossible d'ouvrir le fichier. filePath: %@", THIS_FILE, filePath);
 		
 		return NO;
 	}
 	
-	HTTPLogVerbose(@"%@[%p]: Open fd[%i] -> %@", THIS_FILE, self, fileFD, filePath);
+	HTTPLogVerbose(@"%@[%p]: Ouvrir  fd[%i] -> %@", THIS_FILE, self, fileFD, filePath);
 	
 	readQueue = dispatch_queue_create("HTTPAsyncFileResponse", NULL);
 	readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fileFD, 0, readQueue);
@@ -188,7 +188,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 			
 			if (readBuffer == NULL)
 			{
-				HTTPLogError(@"%@[%p]: Unable to allocate buffer", THIS_FILE, self);
+				HTTPLogError(@"%@[%p]: Impossible d'allouer de tampon", THIS_FILE, self);
 				
 				[self pauseReadSource];
 				[self abort];
@@ -199,28 +199,28 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		
 		// Perform the read
 		
-		HTTPLogVerbose(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, (unsigned long)bytesToRead);
+		HTTPLogVerbose(@"%@[%p]: Tentative de lecture %lu bytes à partir du fichier", THIS_FILE, self, (unsigned long)bytesToRead);
 		
 		ssize_t result = read(fileFD, readBuffer + readBufferOffset, (size_t)bytesToRead);
 		
 		// Check the results
 		if (result < 0)
 		{
-			HTTPLogError(@"%@: Error(%i) reading file(%@)", THIS_FILE, errno, filePath);
+			HTTPLogError(@"%@: Erreur (%i) Lire le fichier(%@)", THIS_FILE, errno, filePath);
 			
 			[self pauseReadSource];
 			[self abort];
 		}
 		else if (result == 0)
 		{
-			HTTPLogError(@"%@: Read EOF on file(%@)", THIS_FILE, filePath);
+			HTTPLogError(@"%@: Lire EOF dans le fichier(%@)", THIS_FILE, filePath);
 			
 			[self pauseReadSource];
 			[self abort];
 		}
 		else // (result > 0)
 		{
-			HTTPLogVerbose(@"%@[%p]: Read %lu bytes from file", THIS_FILE, self, (unsigned long)result);
+			HTTPLogVerbose(@"%@[%p]: lire %lu bytes a partir du fichier ", THIS_FILE, self, (unsigned long)result);
 			
 			readOffset += result;
 			readBufferOffset += result;
@@ -242,7 +242,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		// 
 		// Note: You access self if you reference an iVar.
 		
-		HTTPLogTrace2(@"%@: cancelBlock - Close fd[%i]", THIS_FILE, theFileFD);
+		HTTPLogTrace2(@"%@: cancelBlock - Ferme fd[%i]", THIS_FILE, theFileFD);
 		
 		#if !OS_OBJECT_USE_OBJC
 		dispatch_release(theReadSource);
@@ -319,7 +319,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	{
 		NSUInteger dataLength = [data length];
 		
-		HTTPLogVerbose(@"%@[%p]: Returning data of length %lu", THIS_FILE, self, (unsigned long)dataLength);
+		HTTPLogVerbose(@"%@[%p]: Retourner la longueur des données %lu", THIS_FILE, self, (unsigned long)dataLength);
 		
 		fileOffset += dataLength;
 		
@@ -339,7 +339,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		
 		dispatch_sync(readQueue, ^{
 			
-			NSAssert(readSourceSuspended, @"Invalid logic - perhaps HTTPConnection has changed.");
+			NSAssert(readSourceSuspended, @"Logique invalide - perhaps HTTPConnection has changed.");
 			
 			readRequestLength = length;
 			[self resumeReadSource];
