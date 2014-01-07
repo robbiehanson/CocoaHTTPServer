@@ -1947,7 +1947,7 @@ static NSMutableArray *recentNonces;
 	
 	if ([request.method isEqual:@"OPTIONS"])
 	{
-		[response setHeaderField:@"Allow" value:@"GET, HEAD, OPTIONS"];
+		[response setHeaderField:@"Allow" value:[[[self supportedMethodsAtPath:request.url.path] allObjects] componentsJoinedByString:@", "]];
 	}
 	
 	// Add optional response headers
