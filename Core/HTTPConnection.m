@@ -209,6 +209,8 @@ static NSMutableArray *recentNonces;
 		numHeaderLines = 0;
 		
 		responseDataSizes = [[NSMutableArray alloc] initWithCapacity:5];
+        
+        useCallBack = NO;
 	}
 	return self;
 }
@@ -989,16 +991,23 @@ static NSMutableArray *recentNonces;
 	// Note: We already checked to ensure the method was supported in onSocket:didReadData:withTag:
 	
 	// Respond properly to HTTP 'GET' and 'HEAD' commands
-	[self httpResponseForMethod:method URI:uri];
-    //	httpResponse = [self httpResponseForMethod:method URI:uri];
-    //
-    //	if (httpResponse == nil)
-    //	{
-    //		[self handleResourceNotFound];
-    //		return;
-    //	}
-    //
-    //	[self sendResponseHeadersAndBody];
+    if (useCallBack) {
+        
+        [self httpResponseForMethodStart:method URI:uri];
+        
+    } else {
+        
+        httpResponse = [self httpResponseForMethod:method URI:uri];
+        
+        if (httpResponse == nil)
+        {
+            [self handleResourceNotFound];
+            return;
+        }
+        
+        [self sendResponseHeadersAndBody];
+        
+    }
 }
 
 /**
@@ -1679,10 +1688,53 @@ static NSMutableArray *recentNonces;
  * HTTPFileResponse is a wrapper for an NSFileHandle object, and is the preferred way to send a file response.
  * HTTPDataResponse is a wrapper for an NSData object, and may be used to send a custom response.
  *
+ **/
+- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
+{
+	HTTPLogTrace();
+	
+	// Override me to provide custom responses.
+	
+	NSString *filePath = [self filePathForURI:path allowDirectory:NO];
+	
+	BOOL isDir = NO;
+	
+	if (filePath && [[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDir] && !isDir)
+	{
+		return [[HTTPFileResponse alloc] initWithFilePath:filePath forConnection:self];
+        
+		// Use me instead for asynchronous file IO.
+		// Generally better for larger files.
+		
+        //        return [[[HTTPAsyncFileResponse alloc] initWithFilePath:filePath forConnection:self] autorelease];
+        return [[HTTPAsyncFileResponse alloc] initWithFilePath:filePath forConnection:self];
+        
+	}
+	
+	return nil;
+}
+
+- (BOOL)useCallBack
+{
+    return useCallBack;
+}
+
+- (void)setUseCallBack:(BOOL)ucb
+{
+    useCallBack = ucb;
+}
+
+/**
+ * This method is called to get a response for a request.
+ * You may return any object that adopts the HTTPResponse protocol.
+ * The HTTPServer comes with two such classes: HTTPFileResponse and HTTPDataResponse.
+ * HTTPFileResponse is a wrapper for an NSFileHandle object, and is the preferred way to send a file response.
+ * HTTPDataResponse is a wrapper for an NSData object, and may be used to send a custom response.
+ *
  * Changed to work with call back method setup
  **/
 //- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
-- (void)httpResponseForMethod:(NSString *)method URI:(NSString *)path
+- (void)httpResponseForMethodStart:(NSString *)method URI:(NSString *)path
 {
 	HTTPLogTrace();
 	
@@ -1695,17 +1747,14 @@ static NSMutableArray *recentNonces;
 	if (filePath && [[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDir] && !isDir)
 	{
         [self httpResponseForMethodFinished:[[HTTPFileResponse alloc] initWithFilePath:filePath forConnection:self]];
-        //		return [[HTTPFileResponse alloc] initWithFilePath:filePath forConnection:self];
         
 		// Use me instead for asynchronous file IO.
 		// Generally better for larger files.
 		
-        //	return [[[HTTPAsyncFileResponse alloc] initWithFilePath:filePath forConnection:self] autorelease];
         [self httpResponseForMethodFinished:[[HTTPAsyncFileResponse alloc] initWithFilePath:filePath forConnection:self]];
         
 	}
 	
-    //	return nil;
     [self httpResponseForMethodFinished:nil];
 }
 

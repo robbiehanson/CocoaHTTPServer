@@ -17,7 +17,7 @@
 {
 	HTTPServer __unsafe_unretained *server;
 	NSString __strong *documentRoot;
-	dispatch_queue_t queue;
+	dispatch_queue_t __weak queue;
 }
 
 - (id)initWithServer:(HTTPServer *)server documentRoot:(NSString *)documentRoot;
@@ -25,7 +25,7 @@
 
 @property (nonatomic, unsafe_unretained, readonly) HTTPServer *server;
 @property (nonatomic, strong, readonly) NSString *documentRoot;
-@property (nonatomic, readonly) dispatch_queue_t queue;
+@property (weak, nonatomic, readonly) dispatch_queue_t queue;
 
 @end
 
@@ -60,8 +60,10 @@
 	UInt64 requestContentLengthReceived;
 	UInt64 requestChunkSize;
 	UInt64 requestChunkSizeReceived;
-  
+    
 	NSMutableArray *responseDataSizes;
+    
+    BOOL useCallBack;
 }
 
 - (id)initWithAsyncSocket:(GCDAsyncSocket *)newSocket configuration:(HTTPConfig *)aConfig;
@@ -90,9 +92,11 @@
 - (NSArray *)directoryIndexFileNames;
 - (NSString *)filePathForURI:(NSString *)path;
 - (NSString *)filePathForURI:(NSString *)path allowDirectory:(BOOL)allowDirectory;
-//- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path;
-- (void)httpResponseForMethod:(NSString *)method URI:(NSString *)path;
+- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path;
+- (void)httpResponseForMethodStart:(NSString *)method URI:(NSString *)path;
 - (void)httpResponseForMethodFinished:(NSObject<HTTPResponse> *)response;
+- (BOOL)useCallBack;
+- (void)setUseCallBack:(BOOL)useCallBack;
 - (WebSocket *)webSocketForURI:(NSString *)path;
 
 - (void)prepareForBodyWithSize:(UInt64)contentLength;
