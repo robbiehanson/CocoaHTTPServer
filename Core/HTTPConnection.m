@@ -989,7 +989,25 @@ static NSMutableArray *recentNonces;
 	// Note: We already checked to ensure the method was supported in onSocket:didReadData:withTag:
 	
 	// Respond properly to HTTP 'GET' and 'HEAD' commands
-	httpResponse = [self httpResponseForMethod:method URI:uri];
+	[self httpResponseForMethod:method URI:uri];
+    //	httpResponse = [self httpResponseForMethod:method URI:uri];
+    //
+    //	if (httpResponse == nil)
+    //	{
+    //		[self handleResourceNotFound];
+    //		return;
+    //	}
+    //
+    //	[self sendResponseHeadersAndBody];
+}
+
+/**
+ * Add to support call back method support
+ * Call when server is ready to send response to client
+ **/
+-(void)httpResponseForMethodFinished:(NSObject<HTTPResponse> *)response
+{
+	httpResponse = response;
 	
 	if (httpResponse == nil)
 	{
@@ -1660,8 +1678,11 @@ static NSMutableArray *recentNonces;
  * The HTTPServer comes with two such classes: HTTPFileResponse and HTTPDataResponse.
  * HTTPFileResponse is a wrapper for an NSFileHandle object, and is the preferred way to send a file response.
  * HTTPDataResponse is a wrapper for an NSData object, and may be used to send a custom response.
-**/
-- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
+ *
+ * Changed to work with call back method setup
+ **/
+//- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
+- (void)httpResponseForMethod:(NSString *)method URI:(NSString *)path
 {
 	HTTPLogTrace();
 	
@@ -1673,15 +1694,19 @@ static NSMutableArray *recentNonces;
 	
 	if (filePath && [[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDir] && !isDir)
 	{
-		return [[HTTPFileResponse alloc] initWithFilePath:filePath forConnection:self];
-	
+        [self httpResponseForMethodFinished:[[HTTPFileResponse alloc] initWithFilePath:filePath forConnection:self]];
+        //		return [[HTTPFileResponse alloc] initWithFilePath:filePath forConnection:self];
+        
 		// Use me instead for asynchronous file IO.
 		// Generally better for larger files.
 		
-	//	return [[[HTTPAsyncFileResponse alloc] initWithFilePath:filePath forConnection:self] autorelease];
+        //	return [[[HTTPAsyncFileResponse alloc] initWithFilePath:filePath forConnection:self] autorelease];
+        [self httpResponseForMethodFinished:[[HTTPAsyncFileResponse alloc] initWithFilePath:filePath forConnection:self]];
+        
 	}
 	
-	return nil;
+    //	return nil;
+    [self httpResponseForMethodFinished:nil];
 }
 
 - (WebSocket *)webSocketForURI:(NSString *)path
