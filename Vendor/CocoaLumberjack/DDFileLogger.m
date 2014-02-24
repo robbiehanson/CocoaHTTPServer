@@ -1017,14 +1017,16 @@
 
 - (NSString *)description
 {
-	return [@{@"filePath": self.filePath,
-		@"fileName": self.fileName,
-		@"fileAttributes": self.fileAttributes,
-		@"creationDate": self.creationDate,
-		@"modificationDate": self.modificationDate,
-		@"fileSize": @(self.fileSize),
-		@"age": @(self.age),
-		@"isArchived": @(self.isArchived)} description];
+    NSDictionary *dic = @{@"filePath" : self.filePath ?: @"",
+                          @"fileName" : self.fileName ?: @"",
+                          @"fileAttributes" : self.fileAttributes ?: @"",
+                          @"creationDate" : self.creationDate ?: @"",
+                          @"modificationDate" : self.modificationDate ?: @"",
+                          @"fileSize" : @(self.fileSize),
+                          @"age" : @(self.age),
+                          @"isArchived" : @(self.isArchived)};
+    
+	return [dic description];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1033,7 +1035,6 @@
 
 - (BOOL)isArchived
 {
-	
 #if TARGET_IPHONE_SIMULATOR
 	
 	// Extended attributes don't work properly on the simulator.
