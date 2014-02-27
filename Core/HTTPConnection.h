@@ -15,7 +15,7 @@
 
 @interface HTTPConfig : NSObject
 {
-	HTTPServer __unsafe_unretained *server;
+	HTTPServer __weak *server;
 	NSString __strong *documentRoot;
 	dispatch_queue_t queue;
 }
