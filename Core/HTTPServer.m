@@ -3,6 +3,7 @@
 #import "HTTPConnection.h"
 #import "WebSocket.h"
 #import "HTTPLogging.h"
+#import "DNSSDRegistration.h"
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -12,7 +13,7 @@
 // Other flags: trace
 static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 
-@interface HTTPServer (PrivateAPI)
+@interface HTTPServer (PrivateAPI)<DNSSDRegistrationDelegate>
 
 - (void)unpublishBonjour;
 - (void)publishBonjour;
@@ -301,20 +302,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
-		
-		if (netService == nil)
-		{
-			result = nil;
-		}
-		else
-		{
-			
-			dispatch_block_t bonjourBlock = ^{
-				result = [[netService name] copy];
-			};
-			
-			[[self class] performBonjourBlock:bonjourBlock];
-		}
+//		result = [netService registeredName];
 	});
 	
 	return result;
@@ -355,47 +343,6 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 }
 
-/**
- * The extra data to use for this service via Bonjour.
-**/
-- (NSDictionary *)TXTRecordDictionary
-{
-	__block NSDictionary *result;
-	
-	dispatch_sync(serverQueue, ^{
-		result = txtRecordDictionary;
-	});
-	
-	return result;
-}
-
-- (void)setTXTRecordDictionary:(NSDictionary *)value
-{
-	HTTPLogTrace();
-	
-	NSDictionary *valueCopy = [value copy];
-	
-	dispatch_async(serverQueue, ^{
-	
-		txtRecordDictionary = valueCopy;
-		
-		// Update the txtRecord of the netService if it has already been published
-		if (netService)
-		{
-			NSNetService *theNetService = netService;
-			NSData *txtRecordData = nil;
-			if (txtRecordDictionary)
-				txtRecordData = [NSNetService dataFromTXTRecordDictionary:txtRecordDictionary];
-			
-			dispatch_block_t bonjourBlock = ^{
-				[theNetService setTXTRecordData:txtRecordData];
-			};
-			
-			[[self class] performBonjourBlock:bonjourBlock];
-		}
-	});
-	
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Server Control
@@ -559,6 +506,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 #pragma mark Bonjour
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+- (void) startPublishingWithName:(NSString*) serviceName type:(NSString*) serviceType domain: (NSString*) serviceDomain {
+	name = [serviceName copy];
+    type = [serviceType copy];
+    domain = [serviceDomain copy];
+    
+    [self publishBonjour];
+}
+
 - (void)publishBonjour
 {
 	HTTPLogTrace();
@@ -567,32 +522,17 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	if (type)
 	{
-		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:[asyncSocket localPort]];
+		if ([asyncSocket localPort] == 0) {
+            [asyncSocket acceptOnPort:0 error:NULL];
+        }
+        int localPort = [asyncSocket localPort];
+        
+        netService = [[DNSSDRegistration alloc] initWithDomain:domain type:type name:name port:localPort];
 		[netService setDelegate:self];
-		
-		NSNetService *theNetService = netService;
-		NSData *txtRecordData = nil;
-		if (txtRecordDictionary)
-			txtRecordData = [NSNetService dataFromTXTRecordDictionary:txtRecordDictionary];
-		
-		dispatch_block_t bonjourBlock = ^{
-			
-			[theNetService removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-			[theNetService scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-			[theNetService publish];
-			
-			// Do not set the txtRecordDictionary prior to publishing!!!
-			// This will cause the OS to crash!!!
-			if (txtRecordData)
-			{
-				[theNetService setTXTRecordData:txtRecordData];
-			}
-		};
-		
-		[[self class] startBonjourThreadIfNeeded];
-		[[self class] performBonjourBlock:bonjourBlock];
-	}
+        [netService start];
+    };
 }
+
 
 - (void)unpublishBonjour
 {
@@ -602,15 +542,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	if (netService)
 	{
-		NSNetService *theNetService = netService;
-		
-		dispatch_block_t bonjourBlock = ^{
-			
-			[theNetService stop];
-		};
-		
-		[[self class] performBonjourBlock:bonjourBlock];
-		
+		[netService stop];
 		netService = nil;
 	}
 }
@@ -634,27 +566,18 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
  * Called when our bonjour service has been successfully published.
  * This method does nothing but output a log message telling us about the published service.
 **/
-- (void)netServiceDidPublish:(NSNetService *)ns
-{
-	// Override me to do something here...
-	// 
-	// Note: This method is invoked on our bonjour thread.
-	
-	HTTPLogInfo(@"Bonjour Service Published: domain(%@) type(%@) name(%@)", [ns domain], [ns type], [ns name]);
+- (void)dnssdRegistrationDidRegister:(DNSSDRegistration *)sender {
+	HTTPLogInfo(@"Bonjour Service Published: domain(%@) type(%@) name(%@)", domain, type, name);
 }
+
 
 /**
  * Called if our bonjour service failed to publish itself.
- * This method does nothing but output a log message telling us about the published service.
+ * This method does nothing but output a log message telling us about the unpublished service.
 **/
-- (void)netService:(NSNetService *)ns didNotPublish:(NSDictionary *)errorDict
-{
-	// Override me to do something here...
-	// 
-	// Note: This method in invoked on our bonjour thread.
-	
+- (void)dnssdRegistration:(DNSSDRegistration *)sender didNotRegister:(NSError *)error {
 	HTTPLogWarn(@"Failed to Publish Service: domain(%@) type(%@) name(%@) - %@",
-	                                         [ns domain], [ns type], [ns name], errorDict);
+                domain, type, name, [error description]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -691,82 +614,6 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	[webSockets removeObject:[notification object]];
 	
 	[webSocketsLock unlock];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark Bonjour Thread
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * NSNetService is runloop based, so it requires a thread with a runloop.
- * This gives us two options:
- * 
- * - Use the main thread
- * - Setup our own dedicated thread
- * 
- * Since we have various blocks of code that need to synchronously access the netservice objects,
- * using the main thread becomes troublesome and a potential for deadlock.
-**/
-
-static NSThread *bonjourThread;
-
-+ (void)startBonjourThreadIfNeeded
-{
-	HTTPLogTrace();
-	
-	static dispatch_once_t predicate;
-	dispatch_once(&predicate, ^{
-		
-		HTTPLogVerbose(@"%@: Starting bonjour thread...", THIS_FILE);
-		
-		bonjourThread = [[NSThread alloc] initWithTarget:self
-		                                        selector:@selector(bonjourThread)
-		                                          object:nil];
-		[bonjourThread start];
-	});
-}
-
-+ (void)bonjourThread
-{
-	@autoreleasepool {
-	
-		HTTPLogVerbose(@"%@: BonjourThread: Started", THIS_FILE);
-		
-		// We can't run the run loop unless it has an associated input source or a timer.
-		// So we'll just create a timer that will never fire - unless the server runs for 10,000 years.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundeclared-selector"
-		[NSTimer scheduledTimerWithTimeInterval:[[NSDate distantFuture] timeIntervalSinceNow]
-		                                 target:self
-		                               selector:@selector(donothingatall:)
-		                               userInfo:nil
-		                                repeats:YES];
-#pragma clang diagnostic pop
-
-		[[NSRunLoop currentRunLoop] run];
-		
-		HTTPLogVerbose(@"%@: BonjourThread: Aborted", THIS_FILE);
-	
-	}
-}
-
-+ (void)executeBonjourBlock:(dispatch_block_t)block
-{
-	HTTPLogTrace();
-	
-	NSAssert([NSThread currentThread] == bonjourThread, @"Executed on incorrect thread");
-	
-	block();
-}
-
-+ (void)performBonjourBlock:(dispatch_block_t)block
-{
-	HTTPLogTrace();
-	
-	[self performSelector:@selector(executeBonjourBlock:)
-	             onThread:bonjourThread
-	           withObject:block
-	        waitUntilDone:YES];
 }
 
 @end
