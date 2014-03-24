@@ -1,6 +1,6 @@
 CocoaHTTPServer is a small, lightweight, embeddable HTTP server for Mac OS X or iOS applications.
 
-*Changes from the trunk:*
+**Changes from the trunk:**
 - Bonjour services can be seen through bluetooth
 - Check for iPhone 4 or greater removed
 
