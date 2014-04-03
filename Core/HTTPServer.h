@@ -36,9 +36,9 @@
 	UInt16 port;
 	
 	// NSNetService and related variables
-	NSNetService *netService;
+	NSArray *netServices;
 	NSString *domain;
-	NSString *type;
+	NSArray *types;
 	NSString *name;
 	NSString *publishedName;
 	NSDictionary *txtRecordDictionary;
@@ -142,17 +142,18 @@
 - (void)setName:(NSString *)value;
 
 /**
- * Bonjour type for publishing the service.
+ * Bonjour types for publishing the service.
  * The default value is nil.
- * The service will not be published via bonjour unless the type is set.
+ * The service will not be published via bonjour unless a type is set.
  * 
  * If you wish to publish the service as a traditional HTTP server, you should set the type to be "_http._tcp.".
  * 
  * If you change the type after the bonjour service has already been published (server already started),
  * you'll need to invoke the republishBonjour method to update the broadcasted bonjour service.
 **/
-- (NSString *)type;
-- (void)setType:(NSString *)value;
+- (NSArray *)types;
+- (void)setTypes:(NSArray *)value;
+- (void)setType:(NSString*)value; // for backwards compatibility
 
 /**
  * Republishes the service via bonjour if the server is running.
@@ -201,5 +202,11 @@
 
 - (NSUInteger)numberOfHTTPConnections;
 - (NSUInteger)numberOfWebSocketConnections;
+
+
+/** Returns the netServices this server is published as.
+ *
+ **/
+- (NSArray*) netServices;
 
 @end
