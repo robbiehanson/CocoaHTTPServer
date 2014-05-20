@@ -1,3 +1,5 @@
+This is a fork of CocoaHTTPServer, since the original project is no longer maintained
+==================
 CocoaHTTPServer is a small, lightweight, embeddable HTTP server for Mac OS X or iOS applications.
 
 Sometimes developers need an embedded HTTP server in their app. Perhaps it's a server application with remote monitoring. Or perhaps it's a desktop application using HTTP for the communication backend. Or perhaps it's an iOS app providing over-the-air access to documents. Whatever your reason, CocoaHTTPServer can get the job done. It provides:
@@ -12,9 +14,3 @@ Sometimes developers need an embedded HTTP server in their app. Perhaps it's a s
 -   Heavily commented code
 -   Very easily extensible
 -   WebDAV is supported too!
-
-<br/>
-Can't find the answer to your question in any of the [wiki](https://github.com/robbiehanson/CocoaHTTPServer/wiki) articles? Try the **[mailing list](http://groups.google.com/group/cocoahttpserver)**.
-<br/>
-<br/>
-Love the project? Wanna buy me a coffee? (or a beer :D) [![donation](http://www.paypal.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BHF2DJRETGV5S)
