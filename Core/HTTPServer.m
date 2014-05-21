@@ -4,6 +4,8 @@
 #import "WebSocket.h"
 #import "HTTPLogging.h"
 
+NSString *const CocoaHTTPServerDidPublishViaBonjour = @"CocoaHTTPServerDidPublishViaBonjour";
+
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
@@ -222,25 +224,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 - (UInt16)port
 {
 	__block UInt16 result;
-	
-	dispatch_sync(serverQueue, ^{
-		result = port;
-	});
-	
-    return result;
-}
 
-- (UInt16)listeningPort
-{
-	__block UInt16 result;
-	
 	dispatch_sync(serverQueue, ^{
 		if (isRunning)
 			result = [asyncSocket localPort];
 		else
 			result = 0;
 	});
-	
+
 	return result;
 }
 
@@ -285,8 +276,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
  * The default name is an empty string,
  * which should result in the published name being the host name of the computer.
 **/
-- (NSString *)name
-{
+- (NSString *)name {
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
@@ -296,18 +286,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	return result;
 }
 
-- (NSString *)publishedName
-{
+- (NSString *)publishedName {
 	__block NSString *result;
 	
 	dispatch_sync(serverQueue, ^{
 		
-		if (netService == nil)
-		{
+		if (netService == nil) {
 			result = nil;
-		}
-		else
-		{
+		} else {
 			
 			dispatch_block_t bonjourBlock = ^{
 				result = [[netService name] copy];
@@ -638,8 +624,10 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	// Override me to do something here...
 	// 
 	// Note: This method is invoked on our bonjour thread.
-	
 	HTTPLogInfo(@"Bonjour Service Published: domain(%@) type(%@) name(%@)", [ns domain], [ns type], [ns name]);
+
+    // Dunno why but delegate is invoked on the main thread
+    [[NSNotificationCenter defaultCenter] postNotificationName:CocoaHTTPServerDidPublishViaBonjour object:self];
 }
 
 /**

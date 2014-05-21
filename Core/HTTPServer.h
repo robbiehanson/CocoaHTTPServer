@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 
+extern NSString *const CocoaHTTPServerDidPublishViaBonjour;
+
 @class GCDAsyncSocket;
 @class WebSocket;
 
@@ -40,7 +42,6 @@
 	NSString *domain;
 	NSString *type;
 	NSString *name;
-	NSString *publishedName;
 	NSDictionary *txtRecordDictionary;
 	
 	// Connection management
@@ -105,7 +106,6 @@
  * If the server is not running this method returns 0.
 **/
 - (UInt16)port;
-- (UInt16)listeningPort;
 - (void)setPort:(UInt16)value;
 
 /**
