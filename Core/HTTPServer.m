@@ -64,7 +64,8 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		port = 0;
 		
 		// Configure default values for bonjour service
-		
+		includesPeerToPeer = NO;
+
 		// Bonjour domain. Use the local domain by default
 		domain = @"local.";
 		
@@ -397,6 +398,34 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 }
 
+/**
+ * Toggle wether adhoc (peer to peer) networks should be supported or not
+**/
+- (BOOL)includesPeerToPeer
+{
+	__block BOOL result;
+	
+	dispatch_sync(serverQueue, ^{
+		result = includesPeerToPeer;
+	});
+	
+	return result;
+}
+
+- (void)setIncludesPeerToPeer:(BOOL)peer
+{
+	dispatch_async(serverQueue, ^{
+		
+		includesPeerToPeer = peer;
+		
+		// We have to rebroadcast if we change this property
+		if (netService)
+		{
+			[self republishBonjour];
+		}
+	});
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Server Control
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -568,6 +597,11 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	if (type)
 	{
 		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:[asyncSocket localPort]];
+		
+		if ([netService respondsToSelector:@selector(setIncludesPeerToPeer:)])
+		{
+			netService.includesPeerToPeer = includesPeerToPeer;
+		}
 		[netService setDelegate:self];
 		
 		NSNetService *theNetService = netService;
