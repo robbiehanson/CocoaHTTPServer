@@ -24,6 +24,51 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 
 @end
 
+#if TARGET_OS_IPHONE
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000 // iPhone 4.0
+#define IMPLEMENTED_PROTOCOLS <NSNetServiceDelegate>
+#else
+#define IMPLEMENTED_PROTOCOLS
+#endif
+#else
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1060 // Mac OS X 10.6
+#define IMPLEMENTED_PROTOCOLS <NSNetServiceDelegate>
+#else
+#define IMPLEMENTED_PROTOCOLS
+#endif
+#endif
+
+@interface HTTPServer () IMPLEMENTED_PROTOCOLS {
+	// Underlying asynchronous TCP/IP socket
+	GCDAsyncSocket *asyncSocket;
+
+	// Dispatch queues
+	dispatch_queue_t serverQueue;
+	dispatch_queue_t connectionQueue;
+	void *IsOnServerQueueKey;
+	void *IsOnConnectionQueueKey;
+
+	// HTTP server configuration
+	NSString *documentRoot;
+	Class connectionClass;
+	NSString *interface;
+
+	// NSNetService and related variables
+	NSNetService *netService;
+	NSString *domain;
+	NSString *type;
+	NSString *name;
+	NSDictionary *txtRecordDictionary;
+
+	// Connection management
+	NSMutableArray *connections;
+	NSMutableArray *webSockets;
+	NSLock *connectionsLock;
+	NSLock *webSocketsLock;
+
+	BOOL isRunning;
+}
+@end
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark -
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,12 +106,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		// By default bind on all available interfaces, en1, wifi etc
 		interface = nil;
 		
-		// Use a default port of 0
-		// This will allow the kernel to automatically pick an open port for us
-		port = 0;
-		
 		// Configure default values for bonjour service
-		
 		// Bonjour domain. Use the local domain by default
 		domain = @"local.";
 		
@@ -235,15 +275,6 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	return result;
 }
 
-- (void)setPort:(UInt16)value
-{
-	HTTPLogTrace();
-	
-	dispatch_async(serverQueue, ^{
-		port = value;
-	});
-}
-
 /**
  * Domain on which to broadcast this service via Bonjour.
  * The default domain is @"local".
@@ -338,7 +369,6 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	dispatch_async(serverQueue, ^{
 		type = valueCopy;
 	});
-	
 }
 
 /**
@@ -387,20 +417,24 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 #pragma mark Server Control
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)start:(NSError **)errPtr
-{
-	HTTPLogTrace();
-	
+- (BOOL)start:(NSError **)errPtr {
+    // Use a default port of 0
+    // This will allow the kernel to automatically pick an open port for us
+    return[self startUsingPort:0 error:errPtr];
+}
+
+- (BOOL)startUsingPort:(UInt16)port error:(NSError **)errPtr {
+    HTTPLogTrace();
+
 	__block BOOL success = YES;
 	__block NSError *err = nil;
-	
+
 	dispatch_sync(serverQueue, ^{ @autoreleasepool {
-		
+
 		success = [asyncSocket acceptOnInterface:interface port:port error:&err];
-		if (success)
-		{
+		if (success) {
 			HTTPLogInfo(@"%@: Started HTTP server on port %hu", THIS_FILE, [asyncSocket localPort]);
-			
+
 			isRunning = YES;
 			[self publishBonjour];
 		}
@@ -409,10 +443,10 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 			HTTPLogError(@"%@: Failed to start HTTP Server: %@", THIS_FILE, err);
 		}
 	}});
-	
+
 	if (errPtr)
 		*errPtr = err;
-	
+
 	return success;
 }
 
