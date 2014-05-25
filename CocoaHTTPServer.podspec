@@ -12,8 +12,8 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '5.0'
   s.osx.deployment_target = '10.7'
 
-  s.ios.frameworks = 'CFNetwork', 'Security'
-  s.osx.frameworks = 'CoreServices', 'Security'
+  s.ios.frameworks = 'CFNetwork', 'Security', 'MobileCoreServices'
+  s.osx.frameworks = 'CoreServices', 'Security', 'MobileCoreServices'
 
   s.library = 'xml2'
   s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(SDKROOT)/usr/include/libxml2"' }
