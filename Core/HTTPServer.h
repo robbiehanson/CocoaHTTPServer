@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
 extern NSString *const CocoaHTTPServerDidPublishViaBonjour;
+extern NSString *const CocoaHTTPServerDidUnpublishViaBonjour;
 
 @class WebSocket;
 @interface HTTPServer : NSObject

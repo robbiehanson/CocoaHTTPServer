@@ -5,6 +5,7 @@
 #import "HTTPLogging.h"
 
 NSString *const CocoaHTTPServerDidPublishViaBonjour = @"CocoaHTTPServerDidPublishViaBonjour";
+NSString *const CocoaHTTPServerDidUnpublishViaBonjour = @"CocoaHTTPServerDidUnpublishViaBonjour";
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -676,6 +677,8 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	HTTPLogWarn(@"Failed to Publish Service: domain(%@) type(%@) name(%@) - %@",
 	                                         [ns domain], [ns type], [ns name], errorDict);
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:CocoaHTTPServerDidUnpublishViaBonjour object:self];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
