@@ -10,7 +10,9 @@
 #import "HTTPFileResponse.h"
 #import "HTTPAsyncFileResponse.h"
 #import "WebSocket.h"
+
 #import "HTTPLogging.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -204,7 +206,7 @@ static NSMutableArray *recentNonces;
 		lastNC = 0;
 		
 		// Create a new HTTP message
-		request = [[HTTPMessage alloc] initEmptyRequest];
+		request = [[HTTPMessage alloc] init];
 		
 		numHeaderLines = 0;
 		
@@ -1911,6 +1913,27 @@ static NSMutableArray *recentNonces;
 	return [df stringFromDate:date];
 }
 
+#pragma mark - HTTP headers
+
+- (NSString *)fileMIMEType:(NSString *)extension
+{
+    CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+                                                            (__bridge CFStringRef)extension,
+                                                            NULL);
+    CFStringRef MIMEType = UTTypeCopyPreferredTagWithClass (UTI, kUTTagClassMIMEType);
+    CFRelease(UTI);
+    return CFBridgingRelease(MIMEType);
+}
+
+- (void)setupStandardHeaders:(HTTPMessage *)response {
+    // Add standard headers
+	NSString *now = [self dateAsString:[NSDate date]];
+	[response setHeaderField:@"Date" value:now];
+
+	// Add server capability headers
+	[response setHeaderField:@"Accept-Ranges" value:@"bytes"];
+}
+
 /**
  * This method is called immediately prior to sending the response headers.
  * This method adds standard header fields, and then converts the response to an NSData object.
@@ -1922,29 +1945,21 @@ static NSMutableArray *recentNonces;
 	// Override me to customize the response headers
 	// You'll likely want to add your own custom headers, and then return [super preprocessResponse:response]
 	
-	// Add standard headers
-	NSString *now = [self dateAsString:[NSDate date]];
-	[response setHeaderField:@"Date" value:now];
-	
-	// Add server capability headers
-	[response setHeaderField:@"Accept-Ranges" value:@"bytes"];
-	
-	// Add optional response headers
-	if ([httpResponse respondsToSelector:@selector(httpHeaders)])
-	{
+    [self setupStandardHeaders:response];
+    NSString *mimeType = [self fileMIMEType:request.url.pathExtension];
+    [response setHeaderField:@"Content-Type" value:mimeType];
+
+    // Add optional response headers
+	if ([httpResponse respondsToSelector:@selector(httpHeaders)]) 	{
 		NSDictionary *responseHeaders = [httpResponse httpHeaders];
-		
-		NSEnumerator *keyEnumerator = [responseHeaders keyEnumerator];
-		NSString *key;
-		
-		while ((key = [keyEnumerator nextObject]))
-		{
-			NSString *value = [responseHeaders objectForKey:key];
-			
-			[response setHeaderField:key value:value];
-		}
+
+        NSArray *allKeys = [responseHeaders allKeys];
+        for (NSString *key in allKeys) {
+            NSString *value = [responseHeaders objectForKey:key];
+            [response setHeaderField:key value:value];
+        }
 	}
-	
+
 	return [response messageData];
 }
 
@@ -1975,29 +1990,18 @@ static NSMutableArray *recentNonces;
 	//     [response setHeaderField:@"Content-Length" value:contentLengthStr];
 	// }
 	
-	// Add standard headers
-	NSString *now = [self dateAsString:[NSDate date]];
-	[response setHeaderField:@"Date" value:now];
-	
-	// Add server capability headers
-	[response setHeaderField:@"Accept-Ranges" value:@"bytes"];
-	
-	// Add optional response headers
-	if ([httpResponse respondsToSelector:@selector(httpHeaders)])
-	{
+    [self setupStandardHeaders:response];
+
+    // Add optional response headers
+	if ([httpResponse respondsToSelector:@selector(httpHeaders)]) 	{
 		NSDictionary *responseHeaders = [httpResponse httpHeaders];
-		
-		NSEnumerator *keyEnumerator = [responseHeaders keyEnumerator];
-		NSString *key;
-		
-		while((key = [keyEnumerator nextObject]))
-		{
-			NSString *value = [responseHeaders objectForKey:key];
-			
-			[response setHeaderField:key value:value];
-		}
+
+        NSArray *allKeys = [responseHeaders allKeys];
+        for (NSString *key in allKeys) {
+            NSString *value = [responseHeaders objectForKey:key];
+            [response setHeaderField:key value:value];
+        }
 	}
-	
 	return [response messageData];
 }
 
@@ -2458,7 +2462,7 @@ static NSMutableArray *recentNonces;
 				// finishBody method and forgot to call [super finishBody].
 				NSAssert(request == nil, @"Request not properly released in finishBody");
 				
-				request = [[HTTPMessage alloc] initEmptyRequest];
+				request = [[HTTPMessage alloc] init];
 				
 				numHeaderLines = 0;
 				sentResponseHeaders = NO;

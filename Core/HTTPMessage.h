@@ -14,14 +14,8 @@
 
 
 @interface HTTPMessage : NSObject
-{
-	CFHTTPMessageRef message;
-}
-
-- (id)initEmptyRequest;
 
 - (id)initRequestWithMethod:(NSString *)method URL:(NSURL *)url version:(NSString *)version;
-
 - (id)initResponseWithStatusCode:(NSInteger)code description:(NSString *)description version:(NSString *)version;
 
 - (BOOL)appendData:(NSData *)data;

@@ -1,56 +1,27 @@
 #import <Foundation/Foundation.h>
 
-@class GCDAsyncSocket;
+extern NSString *const CocoaHTTPServerDidPublishViaBonjour;
+extern NSString *const CocoaHTTPServerDidUnpublishViaBonjour;
+
 @class WebSocket;
+@interface HTTPServer : NSObject
 
-#if TARGET_OS_IPHONE
-  #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000 // iPhone 4.0
-    #define IMPLEMENTED_PROTOCOLS <NSNetServiceDelegate>
-  #else
-    #define IMPLEMENTED_PROTOCOLS 
-  #endif
-#else
-  #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1060 // Mac OS X 10.6
-    #define IMPLEMENTED_PROTOCOLS <NSNetServiceDelegate>
-  #else
-    #define IMPLEMENTED_PROTOCOLS 
-  #endif
-#endif
-
-
-@interface HTTPServer : NSObject IMPLEMENTED_PROTOCOLS
-{
-	// Underlying asynchronous TCP/IP socket
-	GCDAsyncSocket *asyncSocket;
-	
-	// Dispatch queues
-	dispatch_queue_t serverQueue;
-	dispatch_queue_t connectionQueue;
-	void *IsOnServerQueueKey;
-	void *IsOnConnectionQueueKey;
-	
-	// HTTP server configuration
-	NSString *documentRoot;
-	Class connectionClass;
-	NSString *interface;
-	UInt16 port;
-	
-	// NSNetService and related variables
-	NSNetService *netService;
-	NSString *domain;
-	NSString *type;
-	NSString *name;
-	NSString *publishedName;
-	NSDictionary *txtRecordDictionary;
-	
-	// Connection management
-	NSMutableArray *connections;
-	NSMutableArray *webSockets;
-	NSLock *connectionsLock;
-	NSLock *webSocketsLock;
-	
-	BOOL isRunning;
-}
+/**
+ * The port number to run the HTTP server on.
+ *
+ * The default port number is zero, meaning the server will automatically use any available port.
+ * This is the recommended port value, as it avoids possible port conflicts with other applications.
+ * Technologies such as Bonjour can be used to allow other applications to automatically discover the port number.
+ *
+ * Note: As is common on most OS's, you need root privledges to bind to port numbers below 1024.
+ *
+ * You can change the port property while the server is running, but it won't affect the running server.
+ * To actually change the port the server is listening for connections on you'll need to restart the server.
+ *
+ * The listeningPort method will always return the port number the running server is listening for connections on.
+ * If the server is not running this method returns 0.
+ **/
+@property (nonatomic, readonly) UInt16 port;
 
 /**
  * Specifies the document root to serve files from.
@@ -63,8 +34,7 @@
  * If you change the documentRoot while the server is running,
  * the change will affect future incoming http connections.
 **/
-- (NSString *)documentRoot;
-- (void)setDocumentRoot:(NSString *)value;
+@property (nonatomic, copy) NSString *documentRoot;
 
 /**
  * The connection class is the class used to handle incoming HTTP connections.
@@ -90,25 +60,6 @@
 - (void)setInterface:(NSString *)value;
 
 /**
- * The port number to run the HTTP server on.
- * 
- * The default port number is zero, meaning the server will automatically use any available port.
- * This is the recommended port value, as it avoids possible port conflicts with other applications.
- * Technologies such as Bonjour can be used to allow other applications to automatically discover the port number.
- * 
- * Note: As is common on most OS's, you need root privledges to bind to port numbers below 1024.
- * 
- * You can change the port property while the server is running, but it won't affect the running server.
- * To actually change the port the server is listening for connections on you'll need to restart the server.
- * 
- * The listeningPort method will always return the port number the running server is listening for connections on.
- * If the server is not running this method returns 0.
-**/
-- (UInt16)port;
-- (UInt16)listeningPort;
-- (void)setPort:(UInt16)value;
-
-/**
  * Bonjour domain for publishing the service.
  * The default value is "local.".
  * 
@@ -117,8 +68,7 @@
  * If you change the domain property after the bonjour service has already been published (server already started),
  * you'll need to invoke the republishBonjour method to update the broadcasted bonjour service.
 **/
-- (NSString *)domain;
-- (void)setDomain:(NSString *)value;
+@property (nonatomic, copy) NSString *domain;
 
 /**
  * Bonjour name for publishing the service.
@@ -185,6 +135,7 @@
  * }
 **/
 - (BOOL)start:(NSError **)errPtr;
+- (BOOL)startUsingPort:(UInt16)port error:(NSError **)errPtr;
 
 /**
  * Stops the server, preventing it from accepting any new connections.
