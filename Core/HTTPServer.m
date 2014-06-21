@@ -596,7 +596,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	if (type)
 	{
-		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:[asyncSocket localPort]];
+		UInt16 myPort = asyncSocket.localPort;
+		
+		if (includesPeerToPeer && [netService respondsToSelector:@selector(setIncludesPeerToPeer:)])
+		{
+			myPort = 0;
+		}
+		
+		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:myPort];
 		
 		if ([netService respondsToSelector:@selector(setIncludesPeerToPeer:)])
 		{
@@ -613,7 +620,15 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 			
 			[theNetService removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 			[theNetService scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-			[theNetService publish];
+			
+			NSNetServiceOptions options = 0;
+			
+			if (includesPeerToPeer)
+			{
+				options = NSNetServiceListenForConnections;
+			}
+			
+			[theNetService publishWithOptions:options];
 			
 			// Do not set the txtRecordDictionary prior to publishing!!!
 			// This will cause the OS to crash!!!
@@ -689,6 +704,11 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	HTTPLogWarn(@"Failed to Publish Service: domain(%@) type(%@) name(%@) - %@",
 	                                         [ns domain], [ns type], [ns name], errorDict);
+}
+
+- (void)netService:(NSNetService *)sender didAcceptConnectionWithInputStream:(NSInputStream *)inputStream outputStream:(NSOutputStream *)outputStream
+{
+	//Needs to be implemented by subclass when needed.
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
