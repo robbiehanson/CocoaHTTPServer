@@ -42,7 +42,6 @@
 	NSString *name;
 	NSString *publishedName;
 	NSDictionary *txtRecordDictionary;
-	BOOL includesPeerToPeer;
 	
 	// Connection management
 	NSMutableArray *connections;
@@ -166,14 +165,6 @@
 **/
 - (NSDictionary *)TXTRecordDictionary;
 - (void)setTXTRecordDictionary:(NSDictionary *)dict;
-
-/**
- * If enabled, peer to peer discovery will be used to broadcast this service to peers who are not on the same network
- * Defaults to NO, rebroadcasts the netService when set
- * only works on iOS
-**/
-- (BOOL)includesPeerToPeer;
-- (void)setIncludesPeerToPeer:(BOOL)peer;
 
 /**
  * Attempts to starts the server on the configured port, interface, etc.

@@ -64,8 +64,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		port = 0;
 		
 		// Configure default values for bonjour service
-		includesPeerToPeer = NO;
-
+		
 		// Bonjour domain. Use the local domain by default
 		domain = @"local.";
 		
@@ -398,34 +397,6 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 }
 
-/**
- * Toggle wether adhoc (peer to peer) networks should be supported or not
-**/
-- (BOOL)includesPeerToPeer
-{
-	__block BOOL result;
-	
-	dispatch_sync(serverQueue, ^{
-		result = includesPeerToPeer;
-	});
-	
-	return result;
-}
-
-- (void)setIncludesPeerToPeer:(BOOL)peer
-{
-	dispatch_async(serverQueue, ^{
-		
-		includesPeerToPeer = peer;
-		
-		// We have to rebroadcast if we change this property
-		if (netService)
-		{
-			[self republishBonjour];
-		}
-	});
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Server Control
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -596,17 +567,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	if (type)
 	{
-		UInt16 myPort = asyncSocket.localPort;
-		
-		if (includesPeerToPeer)
-		{
-			myPort = 0;
-		}
-		
-		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:myPort];
-		
-		netService.includesPeerToPeer = includesPeerToPeer;
-
+		netService = [[NSNetService alloc] initWithDomain:domain type:type name:name port:[asyncSocket localPort]];
 		[netService setDelegate:self];
 		
 		NSNetService *theNetService = netService;
@@ -618,15 +579,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 			
 			[theNetService removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 			[theNetService scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-			
-			NSNetServiceOptions options = 0;
-			
-			if (includesPeerToPeer)
-			{
-				options = NSNetServiceListenForConnections;
-			}
-			
-			[theNetService publishWithOptions:options];
+			[theNetService publish];
 			
 			// Do not set the txtRecordDictionary prior to publishing!!!
 			// This will cause the OS to crash!!!
@@ -702,11 +655,6 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 	HTTPLogWarn(@"Failed to Publish Service: domain(%@) type(%@) name(%@) - %@",
 	                                         [ns domain], [ns type], [ns name], errorDict);
-}
-
-- (void)netService:(NSNetService *)sender didAcceptConnectionWithInputStream:(NSInputStream *)inputStream outputStream:(NSOutputStream *)outputStream
-{
-	//Needs to be implemented by subclass when needed.
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
