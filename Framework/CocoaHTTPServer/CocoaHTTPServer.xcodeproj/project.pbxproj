@@ -683,6 +683,7 @@
 				6EF631FA19C4178D006FBD89 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6EF631FB19C4178D006FBD89 /* Build configuration list for PBXNativeTarget "CocoaHTTPServerTests" */ = {
 			isa = XCConfigurationList;
@@ -691,6 +692,7 @@
 				6EF631FD19C4178D006FBD89 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
