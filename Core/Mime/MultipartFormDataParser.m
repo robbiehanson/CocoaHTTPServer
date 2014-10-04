@@ -1,7 +1,7 @@
 
-#import "MultipartFormDataParser.h"
-#import "DDData.h"
-#import "HTTPLogging.h"
+#import <CocoaHTTPServer/MultipartFormDataParser.h>
+#import <CocoaHTTPServer/DDData.h>
+#import <CocoaHTTPServer/HTTPLogging.h> 
 
 #pragma mark log level
 
