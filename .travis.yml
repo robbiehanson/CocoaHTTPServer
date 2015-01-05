@@ -2,7 +2,7 @@ language: objective-c
 
 script:
   - xctool -project Samples/DynamicServer/DynamicServer.xcodeproj -scheme DynamicServer build
-  - xctool -project Samples/iPhoneHTTPServer/iPhoneHTTPServer.xcodeproj -scheme iPhoneHTTPServer build
+  - xctool -project Samples/iPhoneHTTPServer/iPhoneHTTPServer.xcodeproj -scheme iPhoneHTTPServer -sdk iphonesimulator build
   - xctool -project Samples/PasswdHTTPServer/PasswdHTTPServer.xcodeproj -scheme PasswdHTTPServer build
   - xctool -project Samples/PostHTTPServer/PostHTTPServer.xcodeproj -scheme PostHTTPServer build
   - xctool -project Samples/SecureHTTPServer/SecureHTTPServer.xcodeproj -scheme SecureHTTPServer build
