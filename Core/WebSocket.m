@@ -535,11 +535,16 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 
 - (void)sendMessage:(NSString *)msg
 {	
-	NSData *msgData = [msg dataUsingEncoding:NSUTF8StringEncoding];
-	[self sendData:msgData];
+    NSData *msgData = [msg dataUsingEncoding:NSUTF8StringEncoding];
+    [self send:msgData isBinary:NO];
 }
 
 - (void)sendData:(NSData *)msgData
+{
+    [self send:msgData isBinary:YES];
+}
+
+- (void)send:(NSData *)msgData isBinary:(BOOL)isBinary
 {
     HTTPLogTrace();
     
@@ -548,10 +553,12 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	if (isRFC6455)
 	{
 		NSUInteger length = msgData.length;
+		UInt8 prefix[2] = { 0, 0 };
+		prefix[0] = isBinary ? 0x82 : 0x81;
 		if (length <= 125)
 		{
 			data = [NSMutableData dataWithCapacity:(length + 2)];
-			[data appendBytes: "\x81" length:1];
+			[data appendBytes: prefix length:1];
 			UInt8 len = (UInt8)length;
 			[data appendBytes: &len length:1];
 			[data appendData:msgData];
@@ -559,7 +566,8 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		else if (length <= 0xFFFF)
 		{
 			data = [NSMutableData dataWithCapacity:(length + 4)];
-			[data appendBytes: "\x81\x7E" length:2];
+			prefix[1] = 0x7e;
+			[data appendBytes: prefix length:2];
 			UInt16 len = (UInt16)length;
 			[data appendBytes: (UInt8[]){len >> 8, len & 0xFF} length:2];
 			[data appendData:msgData];
@@ -567,7 +575,8 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		else
 		{
 			data = [NSMutableData dataWithCapacity:(length + 10)];
-			[data appendBytes: "\x81\x7F" length:2];
+			prefix[1] = 0x7f;
+			[data appendBytes: prefix length:2];
 			[data appendBytes: (UInt8[]){0, 0, 0, 0, (UInt8)(length >> 24), (UInt8)(length >> 16), (UInt8)(length >> 8), length & 0xFF} length:8];
 			[data appendData:msgData];
 		}
