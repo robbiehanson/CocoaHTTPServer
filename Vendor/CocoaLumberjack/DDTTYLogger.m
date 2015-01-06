@@ -835,9 +835,13 @@ static DDTTYLogger *sharedInstance;
 		
 		appLen = [appName lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 		app = (char *)malloc(appLen + 1);
-		
-		[appName getCString:app maxLength:(appLen+1) encoding:NSUTF8StringEncoding];
-		
+        
+		if (!app)
+            return nil;
+        
+        if (![appName getCString:app maxLength:(appLen+1) encoding:NSUTF8StringEncoding])
+            return nil;
+        
 		// Initialize 'pid' variable (char *)
 		
 		processID = [NSString stringWithFormat:@"%i", (int)getpid()];
@@ -845,7 +849,11 @@ static DDTTYLogger *sharedInstance;
 		pidLen = [processID lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 		pid = (char *)malloc(pidLen + 1);
 		
-		[processID getCString:pid maxLength:(pidLen+1) encoding:NSUTF8StringEncoding];
+		if (!pid)
+            return nil;
+        
+		if (![processID getCString:pid maxLength:(pidLen+1) encoding:NSUTF8StringEncoding])
+            return nil;
 		
 		// Initialize color stuff
 		
@@ -1201,8 +1209,16 @@ static DDTTYLogger *sharedInstance;
 		
 		char msgStack[useStack ? (msgLen + 1) : 1]; // Analyzer doesn't like zero-size array, hence the 1
 		char *msg = useStack ? msgStack : (char *)malloc(msgLen + 1);
-		
-		[logMsg getCString:msg maxLength:(msgLen + 1) encoding:NSUTF8StringEncoding];
+
+		if (!msg)
+			return;
+
+		if (![logMsg getCString:msg maxLength:(msgLen + 1) encoding:NSUTF8StringEncoding]) {
+			if (!useStack) {
+				free(msg);
+			}
+			return;
+		}
 		
 		// Write the log message to STDERR
 		
@@ -1396,8 +1412,10 @@ static DDTTYLogger *sharedInstance;
 			NSUInteger len1 = [escapeSeq lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 			NSUInteger len2 = [fgCodeRaw lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 			
-			[escapeSeq getCString:(fgCode)      maxLength:(len1+1) encoding:NSUTF8StringEncoding];
-			[fgCodeRaw getCString:(fgCode+len1) maxLength:(len2+1) encoding:NSUTF8StringEncoding];
+			if (![escapeSeq getCString:(fgCode)      maxLength:(len1+1) encoding:NSUTF8StringEncoding])
+				return nil;
+			if (![fgCodeRaw getCString:(fgCode+len1) maxLength:(len2+1) encoding:NSUTF8StringEncoding])
+				return nil;
 			
 			fgCodeLen = len1+len2;
 		}
@@ -1430,9 +1448,11 @@ static DDTTYLogger *sharedInstance;
 			NSUInteger len1 = [escapeSeq lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 			NSUInteger len2 = [bgCodeRaw lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 			
-			[escapeSeq getCString:(bgCode)      maxLength:(len1+1) encoding:NSUTF8StringEncoding];
-			[bgCodeRaw getCString:(bgCode+len1) maxLength:(len2+1) encoding:NSUTF8StringEncoding];
-			
+			if (![escapeSeq getCString:(bgCode)      maxLength:(len1+1) encoding:NSUTF8StringEncoding])
+				return nil;
+			if (![bgCodeRaw getCString:(bgCode+len1) maxLength:(len2+1) encoding:NSUTF8StringEncoding])
+				return nil;
+	
 			bgCodeLen = len1+len2;
 		}
 		else if (bgColor && isaXcodeColorTTY)
