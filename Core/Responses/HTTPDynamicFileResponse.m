@@ -59,7 +59,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 {
 	BOOL result = (readOffset == fileLength) && (readBufferOffset == 0);
 	
-	HTTPLogTrace2(@"%@[%p]: isDone - %@", THIS_FILE, self, (result ? @"YES" : @"NO"));
+	HTTPLogTrace2(@"%@[%p]: C'est fait - %@", THIS_FILE, self, (result ? @"YES" : @"NO"));
 	
 	return result;
 }
@@ -109,7 +109,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 				s1 = offset;
 				offset += sepLen;
 				
-				HTTPLogVerbose(@"%@[%p]: Found s1 at %lu", THIS_FILE, self, (unsigned long)s1);
+				HTTPLogVerbose(@"%@[%p]: s1 trouvé à %lu", THIS_FILE, self, (unsigned long)s1);
 			}
 			else
 			{
@@ -119,7 +119,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 				s2 = offset;
 				offset += sepLen;
 				
-				HTTPLogVerbose(@"%@[%p]: Found s2 at %lu", THIS_FILE, self, (unsigned long)s2);
+				HTTPLogVerbose(@"%@[%p]: s2 trouvé à %lu", THIS_FILE, self, (unsigned long)s2);
 			}
 			
 			if (found1 && found2)
@@ -148,7 +148,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 						// Found the replacement value.
 						// Now perform the replacement in the buffer.
 						
-						HTTPLogVerbose(@"%@[%p]: key(%@) -> value(%@)", THIS_FILE, self, key, value);
+						HTTPLogVerbose(@"%@[%p]: Clés(%@) -> Valeur(%@)", THIS_FILE, self, key, value);
 						
 						NSData *v = [[value description] dataUsingEncoding:NSUTF8StringEncoding];
 						NSUInteger vLength = [v length];

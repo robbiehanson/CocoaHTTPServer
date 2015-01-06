@@ -413,14 +413,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		success = [asyncSocket acceptOnInterface:interface port:port error:&err];
 		if (success)
 		{
-			HTTPLogInfo(@"%@: Started HTTP server on port %hu", THIS_FILE, [asyncSocket localPort]);
+			HTTPLogInfo(@"%@: le serveur http a été lancé sur le port %hu", THIS_FILE, [asyncSocket localPort]);
 			
 			isRunning = YES;
 			[self publishBonjour];
 		}
 		else
 		{
-			HTTPLogError(@"%@: Failed to start HTTP Server: %@", THIS_FILE, err);
+			HTTPLogError(@"%@: impossible de démarrer le serveur http: %@", THIS_FILE, err);
 		}
 	}});
 	
@@ -563,7 +563,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 {
 	HTTPLogTrace();
 	
-	NSAssert(dispatch_get_specific(IsOnServerQueueKey) != NULL, @"Must be on serverQueue");
+	NSAssert(dispatch_get_specific(IsOnServerQueueKey) != NULL, @"Doit etre sur la queue du serveur");
 	
 	if (type)
 	{
@@ -598,7 +598,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 {
 	HTTPLogTrace();
 	
-	NSAssert(dispatch_get_specific(IsOnServerQueueKey) != NULL, @"Must be on serverQueue");
+	NSAssert(dispatch_get_specific(IsOnServerQueueKey) != NULL, @"Doit etre sur la queue du serveur");
 	
 	if (netService)
 	{
@@ -640,7 +640,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	// 
 	// Note: This method is invoked on our bonjour thread.
 	
-	HTTPLogInfo(@"Bonjour Service Published: domain(%@) type(%@) name(%@)", [ns domain], [ns type], [ns name]);
+	HTTPLogInfo(@"Bonjour Service Publié: domaine(%@) type(%@) nom(%@)", [ns domain], [ns type], [ns name]);
 }
 
 /**
@@ -653,8 +653,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	// 
 	// Note: This method in invoked on our bonjour thread.
 	
-	HTTPLogWarn(@"Failed to Publish Service: domain(%@) type(%@) name(%@) - %@",
-	                                         [ns domain], [ns type], [ns name], errorDict);
+	HTTPLogWarn(@"Impossible de publier: domaine(%@) type(%@) nom(%@) - %@",[ns domain], [ns type], [ns name], errorDict);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -717,7 +716,7 @@ static NSThread *bonjourThread;
 	static dispatch_once_t predicate;
 	dispatch_once(&predicate, ^{
 		
-		HTTPLogVerbose(@"%@: Starting bonjour thread...", THIS_FILE);
+		HTTPLogVerbose(@"%@: Lancement du thread bonjour ", THIS_FILE);
 		
 		bonjourThread = [[NSThread alloc] initWithTarget:self
 		                                        selector:@selector(bonjourThread)
@@ -730,7 +729,7 @@ static NSThread *bonjourThread;
 {
 	@autoreleasepool {
 	
-		HTTPLogVerbose(@"%@: BonjourThread: Started", THIS_FILE);
+		HTTPLogVerbose(@"%@: BonjourThread: Commencé", THIS_FILE);
 		
 		// We can't run the run loop unless it has an associated input source or a timer.
 		// So we'll just create a timer that will never fire - unless the server runs for 10,000 years.
@@ -745,7 +744,7 @@ static NSThread *bonjourThread;
 
 		[[NSRunLoop currentRunLoop] run];
 		
-		HTTPLogVerbose(@"%@: BonjourThread: Aborted", THIS_FILE);
+		HTTPLogVerbose(@"%@: BonjourThread: Avorté", THIS_FILE);
 	
 	}
 }
@@ -754,7 +753,7 @@ static NSThread *bonjourThread;
 {
 	HTTPLogTrace();
 	
-	NSAssert([NSThread currentThread] == bonjourThread, @"Executed on incorrect thread");
+	NSAssert([NSThread currentThread] == bonjourThread, @"Exécuté sur le thread incorrect");
 	
 	block();
 }
