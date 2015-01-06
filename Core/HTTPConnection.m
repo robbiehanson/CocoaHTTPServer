@@ -139,8 +139,10 @@ static NSMutableArray *recentNonces;
 		[recentNonces addObject:newNonce];
 	}});
 	
-	double delayInSeconds = TIMEOUT_NONCE;
-	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+	uint64_t delayInSeconds = TIMEOUT_NONCE;
+    int64_t delay = (int64_t)(delayInSeconds * NSEC_PER_SEC);
+    
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delay);
 	dispatch_after(popTime, recentNonceQueue, ^{ @autoreleasepool {
 		
 		[recentNonces removeObject:newNonce];
@@ -819,7 +821,7 @@ static NSMutableArray *recentNonces;
 				// r2 is the number of ending bytes to include in the range
 				
 				if(!hasR2) return NO;
-				if(r2 > contentLength) return NO;
+				if(r2 > contentLength) r2 = contentLength;
 				
 				UInt64 startIndex = contentLength - r2;
 				
@@ -842,7 +844,7 @@ static NSMutableArray *recentNonces;
 				// Note: The range is inclusive. So 0-1 has a length of 2 bytes.
 				
 				if(r1 > r2) return NO;
-				if(r2 >= contentLength) return NO;
+				if(r2 >= contentLength) r2 = contentLength - 1;
 				
 				[ranges addObject:[NSValue valueWithDDRange:DDMakeRange(r1, r2 - r1 + 1)]];
 			}

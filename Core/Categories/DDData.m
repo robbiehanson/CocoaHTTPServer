@@ -31,9 +31,9 @@ static char encodingTable[64] = {
 	NSMutableString *stringBuffer = [NSMutableString stringWithCapacity:([self length] * 2)];
 	
     const unsigned char *dataBuffer = [self bytes];
-    int i;
+    NSUInteger i = 0;
     
-    for (i = 0; i < [self length]; ++i)
+    for (i = 0; i != [self length]; ++i)
 	{
         [stringBuffer appendFormat:@"%02x", (unsigned int)dataBuffer[i]];
 	}
@@ -43,6 +43,9 @@ static char encodingTable[64] = {
 
 - (NSString *)base64Encoded
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wconversion"
 	const unsigned char	*bytes = [self bytes];
 	NSMutableString *result = [NSMutableString stringWithCapacity:[self length]];
 	unsigned long ixtext = 0;
@@ -91,6 +94,7 @@ static char encodingTable[64] = {
 	}
 	
 	return [NSString stringWithString:result];
+#pragma clang diagnostic pop
 }
 
 - (NSData *)base64Decoded
@@ -140,9 +144,12 @@ static char encodingTable[64] = {
 			if( ixinbuf == 4 )
 			{
 				ixinbuf = 0;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wconversion"
 				outbuf [0] = ( inbuf[0] << 2 ) | ( ( inbuf[1] & 0x30) >> 4 );
 				outbuf [1] = ( ( inbuf[1] & 0x0F ) << 4 ) | ( ( inbuf[2] & 0x3C ) >> 2 );
 				outbuf [2] = ( ( inbuf[2] & 0x03 ) << 6 ) | ( inbuf[3] & 0x3F );
+#pragma clang diagnostic pop                
 				
 				for( i = 0; i < ctcharsinbuf; i++ )
 					[result appendBytes:&outbuf[i] length:1];

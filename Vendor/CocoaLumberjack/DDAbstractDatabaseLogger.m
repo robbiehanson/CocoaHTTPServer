@@ -133,8 +133,9 @@
 	if ((saveTimer != NULL) && (saveInterval > 0.0) && (unsavedTime > 0.0))
 	{
 		uint64_t interval = (uint64_t)(saveInterval * NSEC_PER_SEC);
-		dispatch_time_t startTime = dispatch_time(unsavedTime, interval);
-		
+        int64_t signedInterval = (int64_t)interval;
+        
+		dispatch_time_t startTime = dispatch_time(unsavedTime, signedInterval);
 		dispatch_source_set_timer(saveTimer, startTime, interval, 1.0);
 		
 		if (saveTimerSuspended)
@@ -178,12 +179,18 @@
 	if ((deleteTimer != NULL) && (deleteInterval > 0.0) && (maxAge > 0.0))
 	{
 		uint64_t interval = (uint64_t)(deleteInterval * NSEC_PER_SEC);
+        int64_t signedInterval = (int64_t)interval;
+        
 		dispatch_time_t startTime;
 		
 		if (lastDeleteTime > 0)
-			startTime = dispatch_time(lastDeleteTime, interval);
+        {
+			startTime = dispatch_time(lastDeleteTime, signedInterval);
+        }
 		else
-			startTime = dispatch_time(DISPATCH_TIME_NOW, interval);
+        {
+			startTime = dispatch_time(DISPATCH_TIME_NOW, signedInterval);
+        }
 		
 		dispatch_source_set_timer(deleteTimer, startTime, interval, 1.0);
 	}
@@ -213,6 +220,8 @@
 #pragma mark Configuration
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wimplicit-retain-self"
 - (NSUInteger)saveThreshold
 {
 	// The design of this method is taken from the DDAbstractLogger implementation.
@@ -723,5 +732,7 @@
 	
 	[self performSaveAndSuspendSaveTimer];
 }
+
+#pragma clang diagnostic pop //"-Wimplicit-retain-self"
 
 @end
