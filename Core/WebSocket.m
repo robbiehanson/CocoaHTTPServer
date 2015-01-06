@@ -705,21 +705,23 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		NSUInteger length = WS_PAYLOAD_LENGTH(frame);
 		nextFrameMasked = masked;
 		maskingKey = nil;
-		if (length <= 125)
-		{
-			if (nextFrameMasked)
-			{
-				[asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
-			}
-			[asyncSocket readDataToLength:length withTimeout:TIMEOUT_NONE tag:TAG_MSG_WITH_LENGTH];
-		}
-		else if (length == 126)
-		{
-			[asyncSocket readDataToLength:2 withTimeout:TIMEOUT_NONE tag:TAG_PAYLOAD_LENGTH16];
-		}
-		else
-		{
-			[asyncSocket readDataToLength:8 withTimeout:TIMEOUT_NONE tag:TAG_PAYLOAD_LENGTH64];
+		
+		switch (length) {
+			case 127:
+				[asyncSocket readDataToLength:8 withTimeout:TIMEOUT_NONE tag:TAG_PAYLOAD_LENGTH64];
+				break;
+			
+			case 126:
+				[asyncSocket readDataToLength:2 withTimeout:TIMEOUT_NONE tag:TAG_PAYLOAD_LENGTH16];
+				break;
+				
+			default:
+				if (nextFrameMasked)
+				{
+					[asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
+				}
+				[asyncSocket readDataToLength:length withTimeout:TIMEOUT_NONE tag:TAG_MSG_WITH_LENGTH];
+				break;
 		}
 	}
 	else if (tag == TAG_PAYLOAD_LENGTH16)
@@ -733,8 +735,15 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	}
 	else if (tag == TAG_PAYLOAD_LENGTH64)
 	{
-		// FIXME: 64bit data size in memory?
-		[self didClose];
+		UInt8 *pFrame = (UInt8 *)[data bytes];
+		UInt64 length;
+		memcpy(&length, pFrame, sizeof(UInt64));
+		length =  CFSwapInt64BigToHost(length);
+		
+		if (nextFrameMasked) {
+			[asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
+		}
+		[asyncSocket readDataToLength:length withTimeout:TIMEOUT_NONE tag:TAG_MSG_WITH_LENGTH];
 	}
 	else if (tag == TAG_MSG_WITH_LENGTH)
 	{
