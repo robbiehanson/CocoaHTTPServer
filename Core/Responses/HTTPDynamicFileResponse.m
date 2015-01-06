@@ -170,9 +170,12 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 								// Replacement is bigger than what it is replacing.
 								// Make sure there is room in the buffer for the replacement.
 								
-								if (diff > (readBufferSize - bufLen))
+                                NSInteger restOfBufferLength = (NSInteger )(readBufferSize - bufLen);
+                                
+								if (diff > restOfBufferLength)
 								{
-									NSUInteger inc = MAX(diff, 256);
+                                    NSUInteger unsignedDiff = (NSUInteger)diff;
+									NSUInteger inc = MAX(unsignedDiff, 256ul);
 									
 									readBufferSize += inc;
 									readBuffer = reallocf(readBuffer, readBufferSize);
@@ -210,9 +213,10 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 							
 							// And don't forget to update our indices.
 							
-							bufLen     += diff;
-							offset     += diff;
-							stopOffset += diff;
+                            NSUInteger unsignedDiff = (NSUInteger)diff;
+							bufLen     += unsignedDiff;
+							offset     += unsignedDiff;
+							stopOffset += unsignedDiff;
 						}
 					}
 					
