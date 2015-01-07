@@ -1,24 +1,10 @@
 #import <Foundation/Foundation.h>
 
 @class GCDAsyncSocket;
+@class DNSSDRegistration;
 @class WebSocket;
 
-#if TARGET_OS_IPHONE
-  #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000 // iPhone 4.0
-    #define IMPLEMENTED_PROTOCOLS <NSNetServiceDelegate>
-  #else
-    #define IMPLEMENTED_PROTOCOLS 
-  #endif
-#else
-  #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1060 // Mac OS X 10.6
-    #define IMPLEMENTED_PROTOCOLS <NSNetServiceDelegate>
-  #else
-    #define IMPLEMENTED_PROTOCOLS 
-  #endif
-#endif
-
-
-@interface HTTPServer : NSObject IMPLEMENTED_PROTOCOLS
+@interface HTTPServer : NSObject
 {
 	// Underlying asynchronous TCP/IP socket
 	GCDAsyncSocket *asyncSocket;
@@ -35,13 +21,11 @@
 	NSString *interface;
 	UInt16 port;
 	
-	// NSNetService and related variables
-	NSNetService *netService;
+	// Bonjour registration and related variables
+	DNSSDRegistration *netService;
 	NSString *domain;
 	NSString *type;
 	NSString *name;
-	NSString *publishedName;
-	NSDictionary *txtRecordDictionary;
 	
 	// Connection management
 	NSMutableArray *connections;
@@ -109,6 +93,11 @@
 - (void)setPort:(UInt16)value;
 
 /**
+ * Publish with bonjour name, type, and domain
+ **/
+- (void) startPublishingWithName:(NSString*) serviceName type:(NSString*) serviceType domain: (NSString*) serviceDomain;
+
+/**
  * Bonjour domain for publishing the service.
  * The default value is "local.".
  * 
@@ -159,12 +148,6 @@
  * If the service was not previously published, this method will publish it (if the server is running).
 **/
 - (void)republishBonjour;
-
-/**
- * 
-**/
-- (NSDictionary *)TXTRecordDictionary;
-- (void)setTXTRecordDictionary:(NSDictionary *)dict;
 
 /**
  * Attempts to starts the server on the configured port, interface, etc.
