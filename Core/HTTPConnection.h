@@ -64,6 +64,8 @@
 	NSMutableArray *responseDataSizes;
 }
 
+@property (nonatomic, readonly) dispatch_queue_t connectionQueue;
+
 - (id)initWithAsyncSocket:(GCDAsyncSocket *)newSocket configuration:(HTTPConfig *)aConfig;
 
 - (void)start;
