@@ -733,8 +733,24 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	}
 	else if (tag == TAG_PAYLOAD_LENGTH64)
 	{
-		// FIXME: 64bit data size in memory?
-		[self didClose];
+		UInt8 *pFrame = (UInt8 *)[data bytes];
+		NSUInteger length =
+		((NSUInteger)pFrame[7]) |
+		((NSUInteger)pFrame[6] << 8) |
+		((NSUInteger)pFrame[5] << 16) |
+		((NSUInteger)pFrame[4] << 24);
+
+#ifdef __arm64__
+		length |= ((NSUInteger)pFrame[3] << 32) |
+		((NSUInteger)pFrame[2] << 40) |
+		((NSUInteger)pFrame[1] << 48) |
+		((NSUInteger)pFrame[0] << 56);
+#endif
+
+		if (nextFrameMasked) {
+			[asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
+		}
+		[asyncSocket readDataToLength:length withTimeout:TIMEOUT_NONE tag:TAG_MSG_WITH_LENGTH];
 	}
 	else if (tag == TAG_MSG_WITH_LENGTH)
 	{
