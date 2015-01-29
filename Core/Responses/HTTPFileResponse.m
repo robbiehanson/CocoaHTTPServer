@@ -222,7 +222,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 {
 	HTTPLogTrace();
 	
-	if (fileFD != NULL_FD)
+	if (fileFD != NULL_FD && fileFD != 0)
 	{
 		HTTPLogVerbose(@"%@[%p]: Close fd[%i]", THIS_FILE, self, fileFD);
 		
