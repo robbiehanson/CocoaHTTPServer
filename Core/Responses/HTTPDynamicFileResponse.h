@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
-#import "HTTPResponse.h"
-#import "HTTPAsyncFileResponse.h"
+#import <CocoaHTTPServer/HTTPResponse.h>
+#import <CocoaHTTPServer/HTTPAsyncFileResponse.h>
 
 /**
  * This class is designed to assist with dynamic content.

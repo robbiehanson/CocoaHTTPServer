@@ -1,4 +1,6 @@
 #import "HTTPRedirectResponse.h"
+
+#define DD_LEGACY_MACROS 1
 #import "HTTPLogging.h"
 
 #if ! __has_feature(objc_arc)
