@@ -22,5 +22,7 @@ FOUNDATION_EXPORT const unsigned char CocoaHTTPServerVersionString[];
 #import <CocoaHTTPServer/HTTPResponse.h>
 #import <CocoaHTTPServer/WebSocket.h>
 #import <CocoaHTTPServer/HTTPServer.h>
+#import <CocoaHTTPServer/HTTPDynamicFileResponse.h>
+
 
 

@@ -8,6 +8,7 @@
 #import "MultipartMessageHeader.h"
 #import "MultipartMessageHeaderField.h"
 
+#define DD_LEGACY_MACROS 1
 #import "HTTPLogging.h"
 
 //-----------------------------------------------------------------

@@ -47,6 +47,7 @@
 **/
 
 #import <CocoaLumberjack/DDLog.h>
+#import <CocoaLumberjack/DDLegacyMacros.h>
 
 // Define logging context for every log message coming from the HTTP server.
 // The logging context can be extracted from the DDLogMessage from within the logging framework,
