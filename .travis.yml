@@ -1,8 +1,19 @@
 language: objective-c
 osx_image: xcode61
-before_install: true
-    - brew update
-    - brew install xctool
+before_install:
+    - git submodule init
+    - git submodule update
+    - git submodule init CocoaAsyncSocket
+    - git submodule update CocoaAsyncSocket
+    - git pull origin master CocoaAsyncSocket/CocoaLumberjack
 script:
-	- xctool -project CocoaAsyncSocket/CocoaLumberjack/Framework/Desktop/Lumberjack.xcodeproj -scheme 'CocoaLumberjack' -sdk macosx -arch x86_64 build
-    - xctool -project Framework/CocoaHTTPServer/CocoaHTTPServer.xcodeproj CODE_SIGNING_REQUIRED=NO -scheme 'CocoaHTTPServer' -sdk macosx -arch x86_64 build
+    - cd CocoaAsyncSocket
+    - cd CocoaLumberjack
+    - git status
+    - cd Framework
+    - cd Desktop
+    - xcodebuild -project Lumberjack.xcodeproj -scheme 'CocoaLumberjack' -sdk macosx -arch x86_64 build
+    - cd ../../
+    - xcodebuild -project Framework/CocoaAsyncSocket/CocoaAsyncSocket.xcodeproj -scheme 'CocoaAsyncSocket' -sdk macosx -arch x86_64 build CODE_SIGNING_REQUIRED=NO
+    - cd ../
+    - xcodebuild -project Framework/CocoaHTTPServer/CocoaHTTPServer.xcodeproj -scheme 'CocoaHTTPServer' -sdk macosx -arch x86_64 build CODE_SIGNING_REQUIRED=NO
