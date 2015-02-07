@@ -2,6 +2,4 @@ language: objective-c
 osx_image: xcode61
 before_install: true
 script:
-    - cd Framework
-    - cd CocoaHTTPServer
-    - xcodebuild CODE_SIGNING_REQUIRED=NO -scheme 'CocoaHTTPServer' test
+    - xcodebuild -project Framework/CocoaHTTPServer/CocoaHTTPServer.xcodeproj CODE_SIGNING_REQUIRED=NO -scheme 'CocoaHTTPServer' test
