@@ -15,7 +15,7 @@ script:
     - cd Framework
     - cd Desktop
     - xcodebuild -project Lumberjack.xcodeproj -scheme 'CocoaLumberjack' -sdk macosx -arch x86_64 build
-    - cd ../../
+    - cd ../../../
     - xcodebuild -project Framework/CocoaAsyncSocket/CocoaAsyncSocket.xcodeproj -scheme 'CocoaAsyncSocket' -sdk macosx -arch x86_64 build CODE_SIGNING_REQUIRED=NO
     - cd ../
     - xcodebuild -project Framework/CocoaHTTPServer/CocoaHTTPServer.xcodeproj -scheme 'CocoaHTTPServer' -sdk macosx -arch x86_64 build CODE_SIGNING_REQUIRED=NO
