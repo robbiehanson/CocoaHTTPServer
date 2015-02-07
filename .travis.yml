@@ -5,9 +5,9 @@ before_install:
     - git submodule update
     - git submodule init CocoaAsyncSocket
     - git submodule update CocoaAsyncSocket
-    - cd CocoaAsyncSocket/CocoaLumberjack
-    - git pull origin master
-    - cd ../../
+    - cd CocoaAsyncSocket
+    - git clone https://github.com/colemancda/CocoaAsyncSocket.git
+    - cd ../
 script:
     - cd CocoaAsyncSocket
     - cd CocoaLumberjack
