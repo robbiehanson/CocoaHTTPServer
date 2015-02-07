@@ -2,4 +2,5 @@ language: objective-c
 osx_image: xcode61
 before_install: true
 script:
-    - xcodebuild -project Framework/CocoaHTTPServer/CocoaHTTPServer.xcodeproj CODE_SIGNING_REQUIRED=NO -scheme 'CocoaHTTPServer' test
+	- xctool -project CocoaAsyncSocket/CocoaLumberjack/Framework/Desktop/Lumberjack.xcodeproj -scheme 'CocoaLumberjack' -sdk macosx -arch x86_64 build
+    - xctool -project Framework/CocoaHTTPServer/CocoaHTTPServer.xcodeproj CODE_SIGNING_REQUIRED=NO -scheme 'CocoaHTTPServer' -sdk macosx -arch x86_64 build
