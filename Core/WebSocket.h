@@ -73,6 +73,7 @@
 **/
 - (void)didOpen;
 - (void)didReceiveMessage:(NSString *)msg;
+- (void)didReceiveData:(NSData *)data;
 - (void)didClose;
 
 @end
@@ -101,5 +102,7 @@
 - (void)webSocket:(WebSocket *)ws didReceiveMessage:(NSString *)msg;
 
 - (void)webSocketDidClose:(WebSocket *)ws;
+
+- (void)webSocket:(WebSocket *)ws didReceiveData:(NSData *)data;
 
 @end
