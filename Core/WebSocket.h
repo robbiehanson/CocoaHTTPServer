@@ -24,7 +24,7 @@
 
 + (BOOL)isWebSocketRequest:(HTTPMessage *)request;
 
-- (id)initWithRequest:(HTTPMessage *)request socket:(GCDAsyncSocket *)socket;
+- (id)initWithRequest:(HTTPMessage *)request socket:(GCDAsyncSocket *)socket NS_DESIGNATED_INITIALIZER;
 
 /**
  * Delegate option.
@@ -64,7 +64,7 @@
  * Sends a message over the WebSocket.
  * This method is thread-safe.
  **/
-- (void)sendData:(NSData *)msg;
+- (void)sendData:(NSData *)msg isBinary:(BOOL)binary;
 
 /**
  * Subclass API
