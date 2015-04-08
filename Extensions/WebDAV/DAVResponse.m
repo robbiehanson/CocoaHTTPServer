@@ -183,9 +183,12 @@ static xmlNodePtr _XMLChildWithName(xmlNodePtr child, const xmlChar* name) {
     // 9.8 COPY Method
     // 9.9 MOVE Method
     if ([method isEqualToString:@"MOVE"] || [method isEqualToString:@"COPY"]) {
-      if ([method isEqualToString:@"COPY"] && ![[headers objectForKey:@"Depth"] isEqualToString:@"infinity"]) {
-        HTTPLogError(@"Unsupported DAV depth \"%@\"", [headers objectForKey:@"Depth"]);
-        return nil;
+      if ([method isEqualToString:@"COPY"]) {
+          NSString *depth = [headers objectForKey:@"Depth"];
+          if (depth != nil && ![depth isEqualToString:@"infinity"]) { // The COPY method on a collection without a Depth header MUST act as if a Depth header with value "infinity" was included
+              HTTPLogError(@"Unsupported DAV depth \"%@\"", [headers objectForKey:@"Depth"]);
+              return nil;
+          }
       }
       
       NSString* sourcePath = [rootPath stringByAppendingPathComponent:resourcePath];
@@ -200,7 +203,7 @@ static xmlNodePtr _XMLChildWithName(xmlNodePtr child, const xmlChar* name) {
       }
       NSString* destinationPath = [rootPath stringByAppendingPathComponent:
         [[destination substringFromIndex:(range.location + range.length)] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-      if (![destinationPath hasPrefix:rootPath] || [[NSFileManager defaultManager] fileExistsAtPath:destinationPath]) {
+      if (![destinationPath hasPrefix:rootPath]) {
         return nil;
       }
       
@@ -210,10 +213,14 @@ static xmlNodePtr _XMLChildWithName(xmlNodePtr child, const xmlChar* name) {
         _status = 409;
       } else {
         BOOL existing = [[NSFileManager defaultManager] fileExistsAtPath:destinationPath];
-        if (existing && [[headers objectForKey:@"Overwrite"] isEqualToString:@"F"]) {
+        BOOL shouldNotOverwrite = [[headers objectForKey:@"Overwrite"] isEqualToString:@"F"];
+        if (existing && shouldNotOverwrite) {
           HTTPLogError(@"Pre-existing destination path \"%@\"", destinationPath);
           _status = 412;
         } else {
+          if (existing && !shouldNotOverwrite) {
+            [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:NULL];
+          }
           if ([method isEqualToString:@"COPY"]) {
             if ([[NSFileManager defaultManager] copyItemAtPath:sourcePath toPath:destinationPath error:NULL]) {
               _status = existing ? 204 : 201;
