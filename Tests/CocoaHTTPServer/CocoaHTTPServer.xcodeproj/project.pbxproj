@@ -42,6 +42,7 @@
 		ABC9D8411AE289C6002ED291 /* ContextFilterLogFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D8351AE289C6002ED291 /* ContextFilterLogFormatter.m */; };
 		ABC9D8421AE289C6002ED291 /* DispatchQueueLogFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D8371AE289C6002ED291 /* DispatchQueueLogFormatter.m */; };
 		ABC9D8431AE289C6002ED291 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = ABC9D8381AE289C6002ED291 /* README.txt */; };
+		ABC9D8461AE2934E002ED291 /* MD5TestData.dat in Resources */ = {isa = PBXBuildFile; fileRef = ABC9D8451AE2934E002ED291 /* MD5TestData.dat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +124,7 @@
 		ABC9D8361AE289C6002ED291 /* DispatchQueueLogFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DispatchQueueLogFormatter.h; sourceTree = "<group>"; };
 		ABC9D8371AE289C6002ED291 /* DispatchQueueLogFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchQueueLogFormatter.m; sourceTree = "<group>"; };
 		ABC9D8381AE289C6002ED291 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		ABC9D8451AE2934E002ED291 /* MD5TestData.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MD5TestData.dat; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +192,7 @@
 		ABC9D7DC1AE28979002ED291 /* CocoaHTTPServerTests */ = {
 			isa = PBXGroup;
 			children = (
+				ABC9D8441AE29337002ED291 /* Resources */,
 				ABC9D7DF1AE28979002ED291 /* CocoaHTTPServerTests.m */,
 				ABC9D7DD1AE28979002ED291 /* Supporting Files */,
 			);
@@ -323,6 +326,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		ABC9D8441AE29337002ED291 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				ABC9D8451AE2934E002ED291 /* MD5TestData.dat */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -414,6 +425,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABC9D83B1AE289C6002ED291 /* About.txt in Resources */,
+				ABC9D8461AE2934E002ED291 /* MD5TestData.dat in Resources */,
 				ABC9D8431AE289C6002ED291 /* README.txt in Resources */,
 				ABC9D8391AE289C6002ED291 /* About.txt in Resources */,
 			);

@@ -9,32 +9,36 @@
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
 
+#import "DDData.h"
+
 @interface CocoaHTTPServerTests : XCTestCase
 
 @end
 
 @implementation CocoaHTTPServerTests
 
-- (void)setUp {
+- (void)setUp
+{
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
 }
 
-- (void)tearDown {
+- (void)tearDown
+{
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
 }
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    XCTAssert(YES, @"Pass");
-}
+- (void)testMD5Digest
+{
+    NSString *testString = @"I love testing this stuff";
+    NSData *testStringData = [testString dataUsingEncoding:NSASCIIStringEncoding];
+    NSData *md5Digest = [testStringData md5Digest];
 
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
+    NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"MD5TestData" ofType:@"dat"];
+    NSData *md5DigestExpected = [NSData dataWithContentsOfFile:path];
+    
+    XCTAssert([md5Digest isEqualToData:md5DigestExpected], "MD5 Digest does not match with the expected value.");
 }
 
 @end
