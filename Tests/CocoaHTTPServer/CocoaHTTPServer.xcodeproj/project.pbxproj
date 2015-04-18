@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		374C3CD11AE298D600F56D97 /* SHA1TestData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 374C3CD01AE298D600F56D97 /* SHA1TestData.dat */; };
 		ABC9D7C61AE28979002ED291 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7C51AE28979002ED291 /* main.m */; };
 		ABC9D7C91AE28979002ED291 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7C81AE28979002ED291 /* AppDelegate.m */; };
 		ABC9D7CC1AE28979002ED291 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7CB1AE28979002ED291 /* ViewController.m */; };
@@ -57,6 +58,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		374C3CD01AE298D600F56D97 /* SHA1TestData.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SHA1TestData.dat; sourceTree = "<group>"; };
 		ABC9D7C01AE28979002ED291 /* CocoaHTTPServer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoaHTTPServer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABC9D7C41AE28979002ED291 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ABC9D7C51AE28979002ED291 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 		ABC9D8441AE29337002ED291 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				374C3CD01AE298D600F56D97 /* SHA1TestData.dat */,
 				ABC9D8451AE2934E002ED291 /* MD5TestData.dat */,
 			);
 			name = Resources;
@@ -427,6 +430,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				374C3CD11AE298D600F56D97 /* SHA1TestData.dat in Resources */,
 				ABC9D83B1AE289C6002ED291 /* About.txt in Resources */,
 				ABC9D8461AE2934E002ED291 /* MD5TestData.dat in Resources */,
 				ABC9D8431AE289C6002ED291 /* README.txt in Resources */,
@@ -547,7 +551,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -585,7 +589,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -666,6 +670,7 @@
 				ABC9D7E51AE28979002ED291 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		ABC9D7E61AE28979002ED291 /* Build configuration list for PBXNativeTarget "CocoaHTTPServerTests" */ = {
 			isa = XCConfigurationList;
@@ -674,6 +679,7 @@
 				ABC9D7E81AE28979002ED291 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
