@@ -20,11 +20,11 @@
 
 - (void)testParseStringIntoUInt64
 {
-    SInt64 intU64ToTest = 62324723;
+    UInt64 intU64ToTest = 62324723;
     
-    SInt64 intU64Tested;
+    UInt64 intU64Tested;
     NSString *intU64String = [NSString stringWithFormat:@"%ld", (long)intU64ToTest];
-    XCTAssert([NSNumber parseString:intU64String intoSInt64:&intU64Tested], @"Parsing of string containing UInt64 failed.");
+    XCTAssert([NSNumber parseString:intU64String intoUInt64:&intU64Tested], @"Parsing of string containing UInt64 failed.");
     
     XCTAssert(intU64Tested == intU64ToTest, @"Parsing of string containing UInt64 is not correct.");
 }
