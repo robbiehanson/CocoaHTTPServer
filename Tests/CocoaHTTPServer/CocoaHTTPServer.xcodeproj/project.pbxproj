@@ -45,6 +45,7 @@
 		ABC9D8431AE289C6002ED291 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = ABC9D8381AE289C6002ED291 /* README.txt */; };
 		ABC9D8461AE2934E002ED291 /* MD5TestData.dat in Resources */ = {isa = PBXBuildFile; fileRef = ABC9D8451AE2934E002ED291 /* MD5TestData.dat */; };
 		ABC9D8481AE29B53002ED291 /* DDNumberTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D8471AE29B53002ED291 /* DDNumberTests.m */; };
+		ABC9D84A1AE2A388002ED291 /* HTTPServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D8491AE2A388002ED291 /* HTTPServerTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +130,7 @@
 		ABC9D8381AE289C6002ED291 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		ABC9D8451AE2934E002ED291 /* MD5TestData.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MD5TestData.dat; sourceTree = "<group>"; };
 		ABC9D8471AE29B53002ED291 /* DDNumberTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDNumberTests.m; sourceTree = "<group>"; };
+		ABC9D8491AE2A388002ED291 /* HTTPServerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPServerTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -199,6 +201,7 @@
 				ABC9D8441AE29337002ED291 /* Resources */,
 				ABC9D7DF1AE28979002ED291 /* DDDataTests.m */,
 				ABC9D8471AE29B53002ED291 /* DDNumberTests.m */,
+				ABC9D8491AE2A388002ED291 /* HTTPServerTests.m */,
 				ABC9D7DD1AE28979002ED291 /* Supporting Files */,
 			);
 			path = CocoaHTTPServerTests;
@@ -477,6 +480,7 @@
 				ABC9D83F1AE289C6002ED291 /* DDLog.m in Sources */,
 				ABC9D81F1AE289A5002ED291 /* HTTPFileResponse.m in Sources */,
 				ABC9D83C1AE289C6002ED291 /* DDAbstractDatabaseLogger.m in Sources */,
+				ABC9D84A1AE2A388002ED291 /* HTTPServerTests.m in Sources */,
 				ABC9D8161AE289A5002ED291 /* HTTPMessage.m in Sources */,
 				ABC9D81D1AE289A5002ED291 /* HTTPDynamicFileResponse.m in Sources */,
 				ABC9D81B1AE289A5002ED291 /* HTTPAsyncFileResponse.m in Sources */,
