@@ -1,18 +1,8 @@
-//
-//  CocoaHTTPServerTests.m
-//  CocoaHTTPServerTests
-//
-//  Created by Antonio Tanzola on 18/04/2015.
-//  Copyright (c) 2015 Antonio Tanzola. All rights reserved.
-//
 
-#import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
-
 #import "DDData.h"
 
 @interface CocoaHTTPServerTests : XCTestCase
-
 @end
 
 @implementation CocoaHTTPServerTests
