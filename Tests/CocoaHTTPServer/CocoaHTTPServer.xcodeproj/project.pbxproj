@@ -13,7 +13,7 @@
 		ABC9D7CF1AE28979002ED291 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABC9D7CD1AE28979002ED291 /* Main.storyboard */; };
 		ABC9D7D11AE28979002ED291 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABC9D7D01AE28979002ED291 /* Images.xcassets */; };
 		ABC9D7D41AE28979002ED291 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABC9D7D21AE28979002ED291 /* LaunchScreen.xib */; };
-		ABC9D7E01AE28979002ED291 /* CocoaHTTPServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7DF1AE28979002ED291 /* CocoaHTTPServerTests.m */; };
+		ABC9D7E01AE28979002ED291 /* DDDataTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7DF1AE28979002ED291 /* DDDataTests.m */; };
 		ABC9D8111AE289A5002ED291 /* DDData.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7EC1AE289A5002ED291 /* DDData.m */; };
 		ABC9D8121AE289A5002ED291 /* DDNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7EE1AE289A5002ED291 /* DDNumber.m */; };
 		ABC9D8131AE289A5002ED291 /* DDRange.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7F01AE289A5002ED291 /* DDRange.m */; };
@@ -68,7 +68,7 @@
 		ABC9D7D31AE28979002ED291 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		ABC9D7D91AE28979002ED291 /* CocoaHTTPServerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CocoaHTTPServerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABC9D7DE1AE28979002ED291 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		ABC9D7DF1AE28979002ED291 /* CocoaHTTPServerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CocoaHTTPServerTests.m; sourceTree = "<group>"; };
+		ABC9D7DF1AE28979002ED291 /* DDDataTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DDDataTests.m; sourceTree = "<group>"; };
 		ABC9D7EB1AE289A5002ED291 /* DDData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDData.h; sourceTree = "<group>"; };
 		ABC9D7EC1AE289A5002ED291 /* DDData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDData.m; sourceTree = "<group>"; };
 		ABC9D7ED1AE289A5002ED291 /* DDNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDNumber.h; sourceTree = "<group>"; };
@@ -193,7 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				ABC9D8441AE29337002ED291 /* Resources */,
-				ABC9D7DF1AE28979002ED291 /* CocoaHTTPServerTests.m */,
+				ABC9D7DF1AE28979002ED291 /* DDDataTests.m */,
 				ABC9D7DD1AE28979002ED291 /* Supporting Files */,
 			);
 			path = CocoaHTTPServerTests;
@@ -451,7 +451,7 @@
 				ABC9D8141AE289A5002ED291 /* HTTPAuthenticationRequest.m in Sources */,
 				ABC9D83E1AE289C6002ED291 /* DDFileLogger.m in Sources */,
 				ABC9D8151AE289A5002ED291 /* HTTPConnection.m in Sources */,
-				ABC9D7E01AE28979002ED291 /* CocoaHTTPServerTests.m in Sources */,
+				ABC9D7E01AE28979002ED291 /* DDDataTests.m in Sources */,
 				ABC9D8131AE289A5002ED291 /* DDRange.m in Sources */,
 				ABC9D8111AE289A5002ED291 /* DDData.m in Sources */,
 				ABC9D83D1AE289C6002ED291 /* DDASLLogger.m in Sources */,
