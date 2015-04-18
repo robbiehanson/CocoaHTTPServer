@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		374C3CD11AE298D600F56D97 /* SHA1TestData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 374C3CD01AE298D600F56D97 /* SHA1TestData.dat */; };
+		374C3CD31AE29A6000F56D97 /* DDRangeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 374C3CD21AE29A6000F56D97 /* DDRangeTests.m */; };
 		ABC9D7C61AE28979002ED291 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7C51AE28979002ED291 /* main.m */; };
 		ABC9D7C91AE28979002ED291 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7C81AE28979002ED291 /* AppDelegate.m */; };
 		ABC9D7CC1AE28979002ED291 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC9D7CB1AE28979002ED291 /* ViewController.m */; };
@@ -58,6 +59,7 @@
 
 /* Begin PBXFileReference section */
 		374C3CD01AE298D600F56D97 /* SHA1TestData.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SHA1TestData.dat; sourceTree = "<group>"; };
+		374C3CD21AE29A6000F56D97 /* DDRangeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDRangeTests.m; sourceTree = "<group>"; };
 		ABC9D7C01AE28979002ED291 /* CocoaHTTPServer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoaHTTPServer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABC9D7C41AE28979002ED291 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ABC9D7C51AE28979002ED291 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 			children = (
 				ABC9D8441AE29337002ED291 /* Resources */,
 				ABC9D7DF1AE28979002ED291 /* DDDataTests.m */,
+				374C3CD21AE29A6000F56D97 /* DDRangeTests.m */,
 				ABC9D7DD1AE28979002ED291 /* Supporting Files */,
 			);
 			path = CocoaHTTPServerTests;
@@ -475,6 +478,7 @@
 				ABC9D83C1AE289C6002ED291 /* DDAbstractDatabaseLogger.m in Sources */,
 				ABC9D8161AE289A5002ED291 /* HTTPMessage.m in Sources */,
 				ABC9D81D1AE289A5002ED291 /* HTTPDynamicFileResponse.m in Sources */,
+				374C3CD31AE29A6000F56D97 /* DDRangeTests.m in Sources */,
 				ABC9D81B1AE289A5002ED291 /* HTTPAsyncFileResponse.m in Sources */,
 				ABC9D83A1AE289C6002ED291 /* GCDAsyncSocket.m in Sources */,
 				ABC9D8211AE289A5002ED291 /* WebSocket.m in Sources */,
