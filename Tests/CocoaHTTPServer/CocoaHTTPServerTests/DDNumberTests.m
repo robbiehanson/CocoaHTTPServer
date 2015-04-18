@@ -9,7 +9,7 @@
 
 - (void)testParseStringIntoSInt64
 {
-    SInt64 int64ToTest = -4343264723;
+    SInt64 int64ToTest = -32323264723;
     
     SInt64 int64Tested;
     NSString *int64String = [NSString stringWithFormat:@"%ld", (long)int64ToTest];
@@ -20,7 +20,7 @@
 
 - (void)testParseStringIntoUInt64
 {
-    UInt64 intU64ToTest = 62324723;
+    UInt64 intU64ToTest = 23232323;
     
     UInt64 intU64Tested;
     NSString *intU64String = [NSString stringWithFormat:@"%ld", (long)intU64ToTest];
