@@ -11,3 +11,4 @@ script:
   - xctool -project Samples/SimpleHTTPServer/SimpleHTTPServer.xcodeproj -scheme SimpleHTTPServer build
   - xctool -project Samples/SimpleWebSocketServer/SimpleWebSocketServer.xcodeproj -scheme SimpleWebSocketServer build
   - xctool -project Samples/WebDAVServer/WebDAVServer.xcodeproj -scheme WebDAVServer build
+  - xctool -project Tests/CocoaHTTPServer/CocoaHTTPServer.xcodeproj -scheme CocoaHTTPServer -sdk iphonesimulator test
