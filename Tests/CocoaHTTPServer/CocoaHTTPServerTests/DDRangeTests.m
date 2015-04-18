@@ -122,6 +122,45 @@
     XCTAssertEqual(result, NSOrderedDescending);
 }
 
+#pragma mark - NSValueDDRangeExtenstions
+
+- (void)testValueWithDDRange
+{
+    NSValue *value = [NSValue valueWithDDRange:self.range1];
+    
+    XCTAssertEqualObjects([NSString stringWithUTF8String:value.objCType], @"{_DDRange=QQ}", @"Type of value should be '{_DDRange=QQ}'");
+
+    DDRange extractedRange;
+    [value getValue:&extractedRange];
+    XCTAssertTrue(DDEqualRanges(extractedRange, self.range1));
+}
+
+- (void)testDDRangeValue
+{
+    NSValue *value = [NSValue valueWithDDRange:self.range1];
+    XCTAssertTrue(DDEqualRanges([value ddrangeValue], self.range1));
+}
+
+- (void)testDDRangeCompare
+{
+    NSValue *range1 = [NSValue valueWithDDRange:self.range1];
+    NSValue *range2 = [NSValue valueWithDDRange:self.range2];
+    NSComparisonResult result = [range1 ddrangeCompare:range2];
+    XCTAssertEqual(result, NSOrderedAscending);
+    
+    result = [range2 ddrangeCompare:range1];
+    XCTAssertEqual(result, NSOrderedDescending);
+    
+    NSValue *rangeEqualLocation1 = [NSValue valueWithDDRange:DDMakeRange(10, 100)];
+    NSValue *rangeEqualLocation2 = [NSValue valueWithDDRange:DDMakeRange(10, 1000)];
+    
+    result = [rangeEqualLocation1 ddrangeCompare:rangeEqualLocation2];
+    XCTAssertEqual(result, NSOrderedAscending);
+    
+    result = [rangeEqualLocation2 ddrangeCompare:rangeEqualLocation1];
+    XCTAssertEqual(result, NSOrderedDescending);
+}
+
 #pragma mark - Convenience Properties
 
 - (DDRange)range1
