@@ -53,4 +53,16 @@
     XCTAssert([sha1Digest isEqualToData:sha1DigestExpected], "SHA1 Digest does not match with the expected value.");
 }
 
+- (void)testHexStringValue
+{
+    NSString *testString = @"I'm quite enamoured by this testing stuff";
+    NSData *testStringData = [testString dataUsingEncoding:NSASCIIStringEncoding];
+
+    NSString *hexString = [testStringData hexStringValue];
+
+    NSString *expectedHexString = @"49276d20717569746520656e616d6f7572656420627920746869732074657374696e67207374756666";
+    
+    XCTAssertEqualObjects(hexString, expectedHexString);
+}
+
 @end
