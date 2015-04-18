@@ -65,4 +65,18 @@
     XCTAssertEqualObjects(hexString, expectedHexString);
 }
 
+- (void)testBase64Encoding
+{
+    NSString *string = @"I'd love to encode and decode this string and be sure that the string is still the same!";
+    NSData *data = [string dataUsingEncoding:NSASCIIStringEncoding];
+    
+    NSString *encodedString = [data base64Encoded];
+    NSData *encodedData = [encodedString dataUsingEncoding:NSASCIIStringEncoding];
+    
+    NSData *decodedData = [encodedData base64Decoded];
+    NSString *decodedString = [[NSString alloc] initWithData:decodedData encoding:NSASCIIStringEncoding];
+    
+    XCTAssert([string isEqualToString:decodedString], "String changes after being encoded64 and decoded64.");
+}
+
 @end
