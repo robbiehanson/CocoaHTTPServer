@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>156372D4-EAD7-415E-B7B2-DF2448F6A148</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>CocoaHTTPServer</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>71CFC0DE1DEFC877B0C5B9F98B971EBA2921D608</key>
 		<string>https://github.com/tanzolone/CocoaHTTPServer.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Tests/CocoaHTTPServer/CocoaHTTPServer.xcodeproj/project.xcworkspace</string>
+	<string>Tests/CocoaHTTPServer/CocoaHTTPServer.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>71CFC0DE1DEFC877B0C5B9F98B971EBA2921D608</key>
