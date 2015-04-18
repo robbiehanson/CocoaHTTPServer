@@ -41,4 +41,16 @@
     XCTAssert([md5Digest isEqualToData:md5DigestExpected], "MD5 Digest does not match with the expected value.");
 }
 
+- (void)testSHA1Digest
+{
+    NSString *testString = @"I really love testing this stuff";
+    NSData *testStringData = [testString dataUsingEncoding:NSASCIIStringEncoding];
+    NSData *sha1Digest = [testStringData sha1Digest];
+    
+    NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SHA1TestData" ofType:@"dat"];
+    NSData *sha1DigestExpected = [NSData dataWithContentsOfFile:path];
+    
+    XCTAssert([sha1Digest isEqualToData:sha1DigestExpected], "SHA1 Digest does not match with the expected value.");
+}
+
 @end
