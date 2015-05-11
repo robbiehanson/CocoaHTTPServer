@@ -1158,10 +1158,13 @@ static NSMutableArray *recentNonces;
 	
 	if (!isChunked && rangeHeader)
 	{
-		if ([self parseRangeRequest:rangeHeader withContentLength:contentLength])
-		{
-			isRangeRequest = YES;
-		}
+        if ([self parseRangeRequest:rangeHeader withContentLength:contentLength])
+        {
+            isRangeRequest = YES;
+        } else {
+            [self handleRequestedRangeNotSatisfiable];
+            return;
+        }
 	}
 	
 	HTTPMessage *response;
@@ -1867,6 +1870,24 @@ static NSMutableArray *recentNonces;
 	NSData *responseData = [self preprocessErrorResponse:response];
 	[asyncSocket writeData:responseData withTimeout:TIMEOUT_WRITE_ERROR tag:HTTP_RESPONSE];
 	
+}
+
+/**
+ * Called if requested range not satisfiable
+ **/
+-(void)handleRequestedRangeNotSatisfiable
+{
+    // If you simply want to add a few extra header fields, see the preprocessErrorResponse: method.
+    // You can also use preprocessErrorResponse: to add an optional HTML body.
+    
+    HTTPLogInfo(@"HTTP Server: Error 416 - Requested Range Not Satisfiable : Range:(%@) ContentLength:()", [request headerField:@"Range"], [httpResponse contentLength] );
+    
+    HTTPMessage *response = [[HTTPMessage alloc] initResponseWithStatusCode:416 description:nil version:HTTPVersion1_1];
+    [response setHeaderField:@"Content-Length" value:@"0"];
+    
+    NSData *responseData = [self preprocessErrorResponse:response];
+    [asyncSocket writeData:responseData withTimeout:TIMEOUT_WRITE_ERROR tag:HTTP_RESPONSE];
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
