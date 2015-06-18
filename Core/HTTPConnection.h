@@ -51,7 +51,7 @@
 	
 	NSObject<HTTPResponse> *httpResponse;
 	
-	NSMutableArray *ranges;
+	NSArray *ranges;
 	NSMutableArray *ranges_headers;
 	NSString *ranges_boundry;
 	int rangeIndex;

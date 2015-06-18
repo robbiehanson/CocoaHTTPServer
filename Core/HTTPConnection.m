@@ -734,7 +734,7 @@ static NSMutableArray *recentNonces;
  * If successfull, the variables 'ranges' and 'rangeIndex' will be updated, and YES will be returned.
  * Otherwise, NO is returned, and the range request should be ignored.
  **/
-- (BOOL)parseRangeRequest:(NSString *)rangeHeader withContentLength:(UInt64)contentLength
+- (NSArray *)parseRangeRequest:(NSString *)rangeHeader withContentLength:(UInt64)contentLength
 {
 	HTTPLogTrace();
 	
@@ -757,27 +757,28 @@ static NSMutableArray *recentNonces;
 	
 	NSRange eqsignRange = [rangeHeader rangeOfString:@"="];
 	
-	if(eqsignRange.location == NSNotFound) return NO;
+	if(eqsignRange.location == NSNotFound)
+        return nil;
 	
 	NSUInteger tIndex = eqsignRange.location;
 	NSUInteger fIndex = eqsignRange.location + eqsignRange.length;
 	
 	NSMutableString *rangeType  = [[rangeHeader substringToIndex:tIndex] mutableCopy];
-	NSMutableString *rangeValue = [[rangeHeader substringFromIndex:fIndex] mutableCopy];
-	
-	CFStringTrimWhitespace((__bridge CFMutableStringRef)rangeType);
-	CFStringTrimWhitespace((__bridge CFMutableStringRef)rangeValue);
-	
-	if([rangeType caseInsensitiveCompare:@"bytes"] != NSOrderedSame) return NO;
+    CFStringTrimWhitespace((__bridge CFMutableStringRef)rangeType);
+
+	if([rangeType caseInsensitiveCompare:@"bytes"] != NSOrderedSame)
+        return nil;
+
+    NSMutableString *rangeValue = [[rangeHeader substringFromIndex:fIndex] mutableCopy];
+    CFStringTrimWhitespace((__bridge CFMutableStringRef)rangeValue);
 	
 	NSArray *rangeComponents = [rangeValue componentsSeparatedByString:@","];
+	if([rangeComponents count] == 0)
+        return nil;
 	
-	if([rangeComponents count] == 0) return NO;
+	NSMutableArray *headerRanges = [[NSMutableArray alloc] initWithCapacity:rangeComponents.count];
 	
-	ranges = [[NSMutableArray alloc] initWithCapacity:[rangeComponents count]];
-	
-	rangeIndex = 0;
-	
+
 	// Note: We store all range values in the form of DDRange structs, wrapped in NSValue objects.
 	// Since DDRange consists of UInt64 values, the range extends up to 16 exabytes.
 	
@@ -793,11 +794,13 @@ static NSMutableArray *recentNonces;
 			// We're dealing with an individual byte number
 			
 			UInt64 byteIndex;
-			if(![NSNumber parseString:rangeComponent intoUInt64:&byteIndex]) return NO;
+			if(![NSNumber parseString:rangeComponent intoUInt64:&byteIndex])
+                return nil;
 			
-			if(byteIndex >= contentLength) return NO;
+			if(byteIndex >= contentLength)
+                return nil;
 			
-			[ranges addObject:[NSValue valueWithDDRange:DDMakeRange(byteIndex, 1)]];
+			[headerRanges addObject:[NSValue valueWithDDRange:DDMakeRange(byteIndex, 1)]];
 		}
 		else
 		{
@@ -820,12 +823,15 @@ static NSMutableArray *recentNonces;
 				// 
 				// r2 is the number of ending bytes to include in the range
 				
-				if(!hasR2) return NO;
-				if(r2 > contentLength) return NO;
+				if (!hasR2)
+                    return nil;
+
+				if (r2 > contentLength)
+                    return nil;
 				
 				UInt64 startIndex = contentLength - r2;
 				
-				[ranges addObject:[NSValue valueWithDDRange:DDMakeRange(startIndex, r2)]];
+				[headerRanges addObject:[NSValue valueWithDDRange:DDMakeRange(startIndex, r2)]];
 			}
 			else if (!hasR2)
 			{
@@ -833,9 +839,10 @@ static NSMutableArray *recentNonces;
 				// 
 				// r1 is the starting index of the range, which goes all the way to the end
 				
-				if(r1 >= contentLength) return NO;
+				if(r1 >= contentLength)
+                    return nil;
 				
-				[ranges addObject:[NSValue valueWithDDRange:DDMakeRange(r1, contentLength - r1)]];
+				[headerRanges addObject:[NSValue valueWithDDRange:DDMakeRange(r1, contentLength - r1)]];
 			}
 			else
 			{
@@ -843,15 +850,19 @@ static NSMutableArray *recentNonces;
 				// 
 				// Note: The range is inclusive. So 0-1 has a length of 2 bytes.
 				
-				if(r1 > r2) return NO;
-				if(r2 >= contentLength) return NO;
+				if(r1 > r2)
+                    return nil;
+
+				if(r2 >= contentLength)
+                    return nil;
 				
-				[ranges addObject:[NSValue valueWithDDRange:DDMakeRange(r1, r2 - r1 + 1)]];
+				[headerRanges addObject:[NSValue valueWithDDRange:DDMakeRange(r1, r2 - r1 + 1)]];
 			}
 		}
 	}
 	
-	if([ranges count] == 0) return NO;
+	if([ranges count] == 0)
+        return nil;
 	
 	// Now make sure none of the ranges overlap
 	
@@ -867,17 +878,14 @@ static NSMutableArray *recentNonces;
 			DDRange iRange = DDIntersectionRange(range1, range2);
 			
 			if(iRange.length != 0)
-			{
-				return NO;
-			}
+                return nil;
 		}
 	}
 	
 	// Sort the ranges
+	[headerRanges sortUsingSelector:@selector(ddrangeCompare:)];
 	
-	[ranges sortUsingSelector:@selector(ddrangeCompare:)];
-	
-	return YES;
+	return [headerRanges copy];
 }
 
 - (NSString *)requestURI
@@ -1160,8 +1168,10 @@ static NSMutableArray *recentNonces;
 	
 	if (!isChunked && rangeHeader)
 	{
-		if ([self parseRangeRequest:rangeHeader withContentLength:contentLength])
+        ranges = [self parseRangeRequest:rangeHeader withContentLength:contentLength];
+		if (ranges)
 		{
+            rangeIndex = 0;
 			isRangeRequest = YES;
 		}
 	}
