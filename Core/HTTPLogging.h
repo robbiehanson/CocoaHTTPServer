@@ -48,6 +48,18 @@
 
 #import <CocoaLumberjack/CocoaLumberjack.h>
 
+#ifndef LOG_OBJC_MAYBE
+ // TODO: Remove these... and just use lib directly?
+ #define LOG_MAYBE(async, lvl, flg, ctx, fnct, frmt, ...) \
+  do { if(lvl & flg) LOG_MACRO(async, lvl, flg, ctx, nil, fnct, frmt, ##__VA_ARGS__); } while(0)
+
+#define LOG_OBJC_MAYBE(async, lvl, flg, ctx, frmt, ...) \
+             LOG_MAYBE(async, lvl, flg, ctx, sel_getName(_cmd), frmt, ##__VA_ARGS__)
+
+#define LOG_C_MAYBE(async, lvl, flg, ctx, frmt, ...) \
+          LOG_MAYBE(async, lvl, flg, ctx, __FUNCTION__, frmt, ##__VA_ARGS__)
+#endif
+
 // Define logging context for every log message coming from the HTTP server.
 // The logging context can be extracted from the DDLogMessage from within the logging framework,
 // which gives loggers, formatters, and filters the ability to optionally process them differently.
