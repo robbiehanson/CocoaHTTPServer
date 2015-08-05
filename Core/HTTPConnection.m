@@ -2045,6 +2045,9 @@ static NSMutableArray *recentNonces;
 		else
 		{
 			// We have an entire HTTP request header from the client
+            
+            //add client id to headers
+            [request setHeaderField:@"client-ip" value:asyncSocket.connectedHost];
 			
 			// Extract the method (such as GET, HEAD, POST, etc)
 			NSString *method = [request method];
