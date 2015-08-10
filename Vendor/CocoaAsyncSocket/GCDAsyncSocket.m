@@ -5865,7 +5865,8 @@ enum GCDAsyncSocketConfig
 			NSDictionary *tlsSettings = tlsPacket->tlsSettings;
 			
 			NSNumber *value;
-			
+
+#ifndef __IPHONE_4_0
 			value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsAnyRoot];
 			if (value && [value boolValue] == YES)
 				canUseSecureTransport = NO;
@@ -5873,14 +5874,17 @@ enum GCDAsyncSocketConfig
 			value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsExpiredRoots];
 			if (value && [value boolValue] == YES)
 				canUseSecureTransport = NO;
-			
+#endif
+
 			value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLValidatesCertificateChain];
 			if (value && [value boolValue] == NO)
 				canUseSecureTransport = NO;
-			
+
+#ifndef __IPHONE_4_0
 			value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
 			if (value && [value boolValue] == YES)
 				canUseSecureTransport = NO;
+#endif
 		}
 		#endif
 		
@@ -6230,6 +6234,7 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	
 	// 2. kCFStreamSSLAllowsAnyRoot
 	
+#ifndef __IPHONE_4_0
 	value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsAnyRoot];
 	if (value)
 	{
@@ -6248,9 +6253,11 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 		
 		#endif
 	}
-	
+#endif
+
 	// 3. kCFStreamSSLAllowsExpiredRoots
 	
+#ifndef __IPHONE_4_0
 	value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsExpiredRoots];
 	if (value)
 	{
@@ -6269,7 +6276,8 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 		
 		#endif
 	}
-	
+#endif
+
 	// 4. kCFStreamSSLValidatesCertificateChain
 	
 	value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLValidatesCertificateChain];
@@ -6292,7 +6300,7 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	}
 	
 	// 5. kCFStreamSSLAllowsExpiredCertificates
-	
+#ifndef __IPHONE_4_0
 	value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
 	if (value)
 	{
@@ -6311,7 +6319,8 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 		
 		#endif
 	}
-	
+#endif
+
 	// 6. kCFStreamSSLCertificates
 	
 	value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLCertificates];
@@ -6742,6 +6751,10 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	
 	LogInfo(@"CFStreamThread: Stopped");
 }}
+
++ (void) doNothingAtAll:(id)sender {
+    NSAssert(NO, @"Never go here.");
+}
 
 + (void)scheduleCFStreams:(GCDAsyncSocket *)asyncSocket
 {

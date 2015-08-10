@@ -7,6 +7,10 @@
 
 @implementation HTTPMessage
 
+- (CFHTTPMessageRef) message {
+    return message;
+}
+
 - (id)initEmptyRequest
 {
 	if ((self = [super init]))

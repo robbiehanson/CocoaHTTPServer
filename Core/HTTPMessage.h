@@ -18,6 +18,8 @@
 	CFHTTPMessageRef message;
 }
 
+@property(nonatomic, assign, readonly) CFHTTPMessageRef message;
+
 - (id)initEmptyRequest;
 
 - (id)initRequestWithMethod:(NSString *)method URL:(NSURL *)url version:(NSString *)version;
