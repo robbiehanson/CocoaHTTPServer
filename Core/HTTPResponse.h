@@ -96,7 +96,7 @@
  * each chunk.  Please see the HTTPAsyncFileResponse class for an example of how to do this.
  * 
  * The normal flow of events for an HTTPConnection while responding to a request is like this:
- *  - Send http resopnse headers
+ *  - Send http response headers
  *  - Get data from response via readDataOfLength method.
  *  - Add data to asyncSocket's write queue.
  *  - Wait for asyncSocket to notify it that the data has been sent.

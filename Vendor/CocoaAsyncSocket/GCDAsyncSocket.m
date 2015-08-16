@@ -6340,7 +6340,7 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 		{
 			if (sslMinLevel || sslMaxLevel)
 			{
-				LogWarn(@"kCFStreamSSLLevel security option ignored. Overriden by "
+				LogWarn(@"kCFStreamSSLLevel security option ignored. Overridden by "
 						@"GCDAsyncSocketSSLProtocolVersionMin and/or GCDAsyncSocketSSLProtocolVersionMax");
 			}
 			else
