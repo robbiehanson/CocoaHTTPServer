@@ -69,7 +69,7 @@
 /**
  * Subclass API
  * 
- * These methods are designed to be overriden by subclasses.
+ * These methods are designed to be overridden by subclasses.
 **/
 - (void)didOpen;
 - (void)didReceiveMessage:(NSString *)msg;

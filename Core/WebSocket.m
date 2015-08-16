@@ -229,7 +229,7 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 **/
 - (void)start
 {
-	// This method is not exactly designed to be overriden.
+	// This method is not exactly designed to be overridden.
 	// Subclasses are encouraged to override the didOpen method instead.
 	
 	dispatch_async(websocketQueue, ^{ @autoreleasepool {
@@ -255,7 +255,7 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 **/
 - (void)stop
 {
-	// This method is not exactly designed to be overriden.
+	// This method is not exactly designed to be overridden.
 	// Subclasses are encouraged to override the didClose method instead.
 	
 	dispatch_async(websocketQueue, ^{ @autoreleasepool {

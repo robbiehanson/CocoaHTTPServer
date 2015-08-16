@@ -7,7 +7,7 @@
  * This is an asynchronous version of HTTPFileResponse.
  * It reads data from the given file asynchronously via GCD.
  * 
- * It may be overriden to allow custom post-processing of the data that has been read from the file.
+ * It may be overridden to allow custom post-processing of the data that has been read from the file.
  * An example of this is the HTTPDynamicFileResponse class.
 **/
 
@@ -51,7 +51,7 @@
  * 
  * readOffset
  *   Represents the offset of the file descriptor.
- *   In other words, the file position indidcator for our read stream.
+ *   In other words, the file position indicator for our read stream.
  *   It might be easy to think of it as the total number of bytes that have been read from the file.
  *   However, this isn't entirely accurate, as the setOffset: method may have caused us to
  *   jump ahead in the file (lseek).
