@@ -150,6 +150,12 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 
 @synthesize websocketQueue;
 
+- (instancetype)init
+{
+  [NSException raise:NSInternalInconsistencyException format:@"Initializer disallowed: %s", __PRETTY_FUNCTION__];
+  return [self initWithRequest:nil socket:nil];
+}
+
 - (id)initWithRequest:(HTTPMessage *)aRequest socket:(GCDAsyncSocket *)socket
 {
 	HTTPLogTrace();
