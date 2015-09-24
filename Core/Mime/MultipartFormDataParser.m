@@ -14,7 +14,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 #ifdef __x86_64__
 #define FMTNSINT "li"
 #else
-#define FMTNSINT "i"
+#define FMTNSINT "lu"
 #endif
 
 
@@ -261,7 +261,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			NSData* decodedData = [MultipartFormDataParser decodedDataFromData:[NSData dataWithBytesNoCopy:(char*)workingData.bytes + offset length:workingData.length - offset - sizeToLeavePending freeWhenDone:NO] encoding:currentEncoding];
 			
 			if( [delegate respondsToSelector:@selector(processContent:WithHeader:)] ) {
-				HTTPLogVerbose(@"MultipartFormDataParser: Processed %"FMTNSINT" bytes of body",sizeToPass);
+				HTTPLogVerbose(@"MultipartFormDataParser: Processed %"FMTNSINT" bytes of body",(unsigned long)sizeToPass);
 
 				[delegate processContent: decodedData WithHeader:currentHeader];
 			}
@@ -417,7 +417,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 }
 
 
-- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(int) length encoding:(int) encoding {
+- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(NSUInteger) length encoding:(int) encoding {
 	// If we have BASE64 or Quoted-Printable encoded data, we have to be sure
 	// we don't break the format.
 	int sizeToLeavePending = 0;
@@ -425,21 +425,21 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 	if( encoding == contentTransferEncoding_base64 ) {	
 		char* bytes = (char*) data.bytes;
 		int i;
-		for( i = length - 1; i > 0; i++ ) {
+		for( i = (int)length - 1; i > 0; i++ ) {
 			if( * (uint16_t*) (bytes + i) == 0x0A0D ) {
 				break;
 			}
 		}
 		// now we've got to be sure that the length of passed data since last line
 		// is multiplier of 4.
-		sizeToLeavePending = (length - i) & ~0x11; // size to leave pending = length-i - (length-i) %4;
+		sizeToLeavePending = ((int)length - i) & ~0x11; // size to leave pending = length-i - (length-i) %4;
 		return sizeToLeavePending;
 	}
 	
 	if( encoding == contentTransferEncoding_quotedPrintable ) {
 		// we don't pass more less then 3 bytes anyway.
 		if( length <= 2 ) 
-			return length;
+			return (int)length;
 		// check the last bytes to be start of encoded symbol.
 		const char* bytes = data.bytes + length - 2;
 		if( bytes[0] == '=' )

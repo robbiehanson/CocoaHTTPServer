@@ -134,7 +134,9 @@ static unsigned int numProcessors;
 		mach_msg_type_number_t infoCount;
 		
 		infoCount = HOST_BASIC_INFO_COUNT;
+#if TARGET_OS_IOS
 		host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)&hostInfo, &infoCount);
+#endif
 		
 		unsigned int result = (unsigned int)(hostInfo.max_cpus);
 		unsigned int one    = (unsigned int)(1);

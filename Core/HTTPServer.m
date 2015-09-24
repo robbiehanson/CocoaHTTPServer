@@ -576,17 +576,10 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 			txtRecordData = [NSNetService dataFromTXTRecordDictionary:txtRecordDictionary];
 		
 		dispatch_block_t bonjourBlock = ^{
-			
+			[theNetService setTXTRecordData:txtRecordData];
 			[theNetService removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 			[theNetService scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 			[theNetService publish];
-			
-			// Do not set the txtRecordDictionary prior to publishing!!!
-			// This will cause the OS to crash!!!
-			if (txtRecordData)
-			{
-				[theNetService setTXTRecordData:txtRecordData];
-			}
 		};
 		
 		[[self class] startBonjourThreadIfNeeded];
