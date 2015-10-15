@@ -46,7 +46,13 @@
  * This means you can pass it multiple variables just like NSLog.
 **/
 
-#import "DDLog.h"
+#import <CocoaLumberjack/CocoaLumberjack.h>
+
+#ifndef LOG_OBJC_MAYBE
+    #define LOG_OBJC_MAYBE(async, lvl, flg, ctx, frmt, ...) \
+        LOG_MAYBE(async, lvl, flg, ctx, 0, __PRETTY_FUNCTION__, frmt, ## __VA_ARGS__)
+#endif
+
 
 // Define logging context for every log message coming from the HTTP server.
 // The logging context can be extracted from the DDLogMessage from within the logging framework,
