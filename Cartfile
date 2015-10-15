@@ -1,0 +1,2 @@
+github "CocoaLumberjack/CocoaLumberjack" "swift_2.0"
+github "robbiehanson/CocoaAsyncSocket" "master"

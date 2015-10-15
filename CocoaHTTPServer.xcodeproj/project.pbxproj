@@ -44,6 +44,9 @@
 		AAEF39671BCF02D60000509E /* HTTPRedirectResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = AAEF39421BCF02D60000509E /* HTTPRedirectResponse.m */; settings = {ASSET_TAGS = (); }; };
 		AAEF39681BCF02D60000509E /* WebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = AAEF39431BCF02D60000509E /* WebSocket.h */; settings = {ASSET_TAGS = (); }; };
 		AAEF39691BCF02D60000509E /* WebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = AAEF39441BCF02D60000509E /* WebSocket.m */; settings = {ASSET_TAGS = (); }; };
+		AAEF3A401BCF14DA0000509E /* Cartfile in Resources */ = {isa = PBXBuildFile; fileRef = AAEF3A3F1BCF14DA0000509E /* Cartfile */; settings = {ASSET_TAGS = (); }; };
+		AAEF3A431BCF17180000509E /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAEF3A421BCF170C0000509E /* CocoaLumberjack.framework */; };
+		AAEF3A451BCF18E20000509E /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAEF3A441BCF18E20000509E /* CocoaAsyncSocket.framework */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -86,6 +89,9 @@
 		AAEF39431BCF02D60000509E /* WebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocket.h; sourceTree = "<group>"; };
 		AAEF39441BCF02D60000509E /* WebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebSocket.m; sourceTree = "<group>"; };
 		AAEF396A1BCF02F20000509E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AAEF3A3F1BCF14DA0000509E /* Cartfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
+		AAEF3A421BCF170C0000509E /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = Carthage/Build/iOS/CocoaLumberjack.framework; sourceTree = "<group>"; };
+		AAEF3A441BCF18E20000509E /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = Carthage/Build/iOS/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +99,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAEF3A451BCF18E20000509E /* CocoaAsyncSocket.framework in Frameworks */,
+				AAEF3A431BCF17180000509E /* CocoaLumberjack.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,8 +110,10 @@
 		AAEF39071BCF02870000509E = {
 			isa = PBXGroup;
 			children = (
+				AAEF3A3F1BCF14DA0000509E /* Cartfile */,
 				AAEF391C1BCF02D60000509E /* CoreHTTPServer */,
 				AAEF396A1BCF02F20000509E /* Info.plist */,
+				AAEF3A411BCF15130000509E /* Frameworks */,
 				AAEF39121BCF02870000509E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -183,6 +193,15 @@
 				AAEF39421BCF02D60000509E /* HTTPRedirectResponse.m */,
 			);
 			path = Responses;
+			sourceTree = "<group>";
+		};
+		AAEF3A411BCF15130000509E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AAEF3A441BCF18E20000509E /* CocoaAsyncSocket.framework */,
+				AAEF3A421BCF170C0000509E /* CocoaLumberjack.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -272,6 +291,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAEF3A401BCF14DA0000509E /* Cartfile in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,6 +420,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -417,6 +441,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;

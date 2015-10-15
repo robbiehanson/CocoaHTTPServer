@@ -1,5 +1,5 @@
 #import "HTTPServer.h"
-#import "GCDAsyncSocket.h"
+#import <CocoaAsyncSocket/GCDAsyncSocket.h>
 #import "HTTPConnection.h"
 #import "WebSocket.h"
 #import "HTTPLogging.h"
@@ -500,6 +500,11 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	[webSockets addObject:ws];
 	
 	[webSocketsLock unlock];
+}
+
+- (NSArray*) netServices;
+{
+    return [netServices copy];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
