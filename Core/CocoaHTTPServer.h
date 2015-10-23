@@ -24,3 +24,10 @@ FOUNDATION_EXPORT const unsigned char CocoaHTTPServerVersionString[];
 #import "HTTPFileResponse.h"
 #import "HTTPAsyncFileResponse.h"
 #import "HTTPLogging.h"
+
+#import "HTTPAsyncFileResponse.h"
+#import "HTTPDataResponse.h"
+#import "HTTPDynamicFileResponse.h"
+#import "HTTPErrorResponse.h"
+#import "HTTPFileResponse.h"
+#import "HTTPRedirectResponse.h"
