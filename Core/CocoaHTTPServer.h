@@ -6,7 +6,7 @@
 //  Copyright © 2015 Robbie Hanson. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for CocoaHTTPServer.
 FOUNDATION_EXPORT double CocoaHTTPServerVersionNumber;
@@ -31,3 +31,5 @@ FOUNDATION_EXPORT const unsigned char CocoaHTTPServerVersionString[];
 #import "HTTPErrorResponse.h"
 #import "HTTPFileResponse.h"
 #import "HTTPRedirectResponse.h"
+
+#import "WebSocket.h"
