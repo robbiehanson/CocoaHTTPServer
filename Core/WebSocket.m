@@ -536,10 +536,14 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 - (void)sendMessage:(NSString *)msg
 {	
 	NSData *msgData = [msg dataUsingEncoding:NSUTF8StringEncoding];
-	[self sendData:msgData];
+	[self sendData:msgData asString:YES];
 }
 
-- (void)sendData:(NSData *)msgData
+- (void)sendData:(NSData *)msg {
+    [self sendData:msg asString:NO];
+}
+
+- (void)sendData:(NSData *)msgData asString:(BOOL)asString
 {
     HTTPLogTrace();
     
@@ -547,30 +551,59 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	
 	if (isRFC6455)
 	{
-		NSUInteger length = msgData.length;
-		if (length <= 125)
-		{
-			data = [NSMutableData dataWithCapacity:(length + 2)];
-			[data appendBytes: "\x81" length:1];
-			UInt8 len = (UInt8)length;
-			[data appendBytes: &len length:1];
-			[data appendData:msgData];
-		}
-		else if (length <= 0xFFFF)
-		{
-			data = [NSMutableData dataWithCapacity:(length + 4)];
-			[data appendBytes: "\x81\x7E" length:2];
-			UInt16 len = (UInt16)length;
-			[data appendBytes: (UInt8[]){len >> 8, len & 0xFF} length:2];
-			[data appendData:msgData];
-		}
-		else
-		{
-			data = [NSMutableData dataWithCapacity:(length + 10)];
-			[data appendBytes: "\x81\x7F" length:2];
-			[data appendBytes: (UInt8[]){0, 0, 0, 0, (UInt8)(length >> 24), (UInt8)(length >> 16), (UInt8)(length >> 8), length & 0xFF} length:8];
-			[data appendData:msgData];
-		}
+        
+        NSUInteger length = msgData.length;
+        
+        if (asString) {
+            		if (length <= 125)
+            		{
+            			data = [NSMutableData dataWithCapacity:(length + 2)];
+            			[data appendBytes: "\x81" length:1];
+            			UInt8 len = (UInt8)length;
+            			[data appendBytes: &len length:1];
+            			[data appendData:msgData];
+            		}
+            		else if (length <= 0xFFFF)
+            		{
+            			data = [NSMutableData dataWithCapacity:(length + 4)];
+            			[data appendBytes: "\x81\x7E" length:2];
+            			UInt16 len = (UInt16)length;
+            			[data appendBytes: (UInt8[]){len >> 8, len & 0xFF} length:2];
+            			[data appendData:msgData];
+            		}
+            		else
+            		{
+            			data = [NSMutableData dataWithCapacity:(length + 10)];
+            			[data appendBytes: "\x81\x7F" length:2];
+            			[data appendBytes: (UInt8[]){0, 0, 0, 0, (UInt8)(length >> 24), (UInt8)(length >> 16), (UInt8)(length >> 8), length & 0xFF} length:8];
+            			[data appendData:msgData];
+            		}
+        }
+        else {
+            Byte prefix = 0x80 | WS_OP_BINARY_FRAME;
+            
+            if (length <= 125) {
+                data = [NSMutableData dataWithCapacity:(length + 2)];
+                [data appendBytes:&prefix length:1];
+                UInt8 len = (UInt8)length;
+                [data appendBytes:&len length:1];
+                [data appendData:msgData];
+            } else if (length <= 0xFFFF) {
+                Byte extendedPrefix[2] = {prefix, 0x7E};
+                data = [NSMutableData dataWithCapacity:(length + 4)];
+                [data appendBytes:extendedPrefix length:2];
+                UInt16 len = (UInt16)length;
+                [data appendBytes:(UInt8[]) { len >> 8, len & 0xFF } length:2];
+                [data appendData:msgData];
+            } else {
+                Byte extendedPrefix[2] = {prefix, 0x7F};
+                data = [NSMutableData dataWithCapacity:(length + 10)];
+                [data appendBytes:extendedPrefix length:2];
+                [data appendBytes:(UInt8[]) { 0, 0, 0, 0, (UInt8)(length >> 24), (UInt8)(length >> 16), (UInt8)(length >> 8), length & 0xFF } length:8];
+                [data appendData:msgData];
+            }
+        }
+        
 	}
 	else
 	{
@@ -600,6 +633,20 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	{
 		[delegate webSocket:self didReceiveMessage:msg];
 	}
+}
+
+- (void)didReceiveData:(NSData *)data {
+    // HTTPLogTrace();
+    
+    // Override me to process incoming messages.
+    // This method is invoked on the websocketQueue.
+    //
+    // For completeness, you should invoke [super didReceiveMessage:msg] in your method.
+    
+    // Notify delegate
+    if ([delegate respondsToSelector:@selector(webSocket:didReceiveData:)]) {
+        [delegate webSocket:self didReceiveData:data];
+    }
 }
 
 - (void)didClose
@@ -754,6 +801,9 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 			NSString *msg = [[NSString alloc] initWithBytes:[data bytes] length:msgLength encoding:NSUTF8StringEncoding];
 			[self didReceiveMessage:msg];
 		}
+        else if (nextOpCode == WS_OP_BINARY_FRAME) {
+            [self didReceiveData:data];
+        }
 		else
 		{
 			[self didClose];
