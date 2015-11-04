@@ -539,7 +539,7 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	[self sendData:msgData asString:YES];
 }
 
-- (void)sendData:(NSData *)msg {
+- (void)sendBinaryData:(NSData *)msg {
     [self sendData:msg asString:NO];
 }
 
