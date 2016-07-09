@@ -602,6 +602,22 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	}
 }
 
+- (void)didReceiveData:(NSData *)data
+{
+	HTTPLogTrace();
+
+	// Override me to process incoming data.
+	// This method is invoked on the websocketQueue.
+	//
+	// For completeness, you should invoke [super didReceiveData:data] in your method.
+
+	// Notify delegate
+	if ([delegate respondsToSelector:@selector(webSocket:didReceiveData:)])
+	{
+		[delegate webSocket:self didReceiveData:data];
+	}
+}
+
 - (void)didClose
 {
 	HTTPLogTrace();
@@ -733,12 +749,21 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	}
 	else if (tag == TAG_PAYLOAD_LENGTH64)
 	{
-		//FIX: 64 bit length
+
 		UInt8 *pFrame = (UInt8 *)[data bytes];
-		uint64_t length = ((uint64_t)pFrame[0] << 56) | ((uint64_t)pFrame[1]<<48) | ((uint64_t)pFrame[2] << 40) | ((uint64_t)pFrame[3]<<32)
-        | ((uint64_t)pFrame[4] << 24) | ((uint64_t)pFrame[5]<<16) | ((uint64_t)pFrame[6] << 8) | (uint64_t)pFrame[7];
-		//althouth this is a 64bit unsigned integer length, it is used because data frame is greater than 64k
-		//here, we assume that the actual length will fit in a 32bit integer
+		NSUInteger length =
+		((NSUInteger)pFrame[7]) |
+		((NSUInteger)pFrame[6] << 8) |
+		((NSUInteger)pFrame[5] << 16) |
+		((NSUInteger)pFrame[4] << 24);
+
+#ifdef __arm64__
+		length |= ((NSUInteger)pFrame[3] << 32) |
+		((NSUInteger)pFrame[2] << 40) |
+		((NSUInteger)pFrame[1] << 48) |
+		((NSUInteger)pFrame[0] << 56);
+#endif
+
 		if (nextFrameMasked) {
 			[asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
 		}
@@ -765,6 +790,10 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		else if(nextOpCode == WS_OP_PING || nextOpCode == WS_OP_PONG){
 			//FIX ME: respond to PING and PONG
 			//But at least, we should not close connection for ping and pong
+        }
+		else if (nextOpCode == WS_OP_BINARY_FRAME)
+		{
+			[self didReceiveData:data];
 		}
 		else
 		{
