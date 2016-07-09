@@ -62,7 +62,10 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 {
 	BOOL isRFC6455;
 	BOOL nextFrameMasked;
+    NSUInteger firstFrameOpCode;
 	NSUInteger nextOpCode;
+    NSMutableData *accumuData;
+    BOOL finFlag;
 	NSData *maskingKey;
 }
 
@@ -680,7 +683,14 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 // + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
 // |                     Payload Data continued ...                |
 // +---------------------------------------------------------------+
-
+//
+// An unfragmented message consists of a single frame with the FIN bit set (Section 5.2) and an opcode other than 0.
+//
+// A fragmented message consists of a single frame with the FIN bit
+// clear and an opcode other than 0, followed by zero or more frames
+//  with the FIN bit clear and the opcode set to 0, and terminated by
+// a single frame with the FIN bit set and an opcode of 0.
+//
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
 	HTTPLogTrace();
@@ -714,6 +724,18 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		if ([self isValidWebSocketFrame: frame])
 		{
 			nextOpCode = (frame & 0x0F);
+            finFlag = ((frame & 0xF0) != 0);
+            if(finFlag){
+                
+            }
+            else if(nextOpCode != 0){
+                // A fragmented message consists of a single frame with the FIN bit
+                // clear and an opcode other than 0, followed by zero or more frames
+                //  with the FIN bit clear and the opcode set to 0, and terminated by
+                // a single frame with the FIN bit set and an opcode of 0.
+                accumuData = [[NSMutableData alloc] init];
+                firstFrameOpCode = nextOpCode;//this is the first frame of fragmented frames
+            }
 			[asyncSocket readDataToLength:1 withTimeout:TIMEOUT_NONE tag:TAG_PAYLOAD_LENGTH];
 		}
 		else
@@ -792,8 +814,14 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		}
 		if (nextOpCode == WS_OP_TEXT_FRAME)
 		{
-			NSString *msg = [[NSString alloc] initWithBytes:[data bytes] length:msgLength encoding:NSUTF8StringEncoding];
-			[self didReceiveMessage:msg];
+            if(accumuData){
+                [accumuData appendData:data];
+            }
+            else{
+                NSString *msg = [[NSString alloc] initWithBytes:[data bytes] length:msgLength encoding:NSUTF8StringEncoding];
+                [self didReceiveMessage:msg];
+            }
+			
 		}
 		else if(nextOpCode == WS_OP_PING || nextOpCode == WS_OP_PONG){
 			//FIX ME: respond to PING and PONG
@@ -801,8 +829,36 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
         }
 		else if (nextOpCode == WS_OP_BINARY_FRAME)
 		{
-			[self didReceiveData:data];
+			
+            if(accumuData){
+                [accumuData appendData:data];
+            }
+            else{
+                [self didReceiveData:data];
+            }
 		}
+        else if(nextOpCode == WS_OP_CONTINUATION_FRAME){
+            // A fragmented message consists of a single frame with the FIN bit
+            // clear and an opcode other than 0, followed by zero or more frames
+            //  with the FIN bit clear and the opcode set to 0, and terminated by
+            // a single frame with the FIN bit set and an opcode of 0.
+            [accumuData appendData:data];
+            if(firstFrameOpCode == WS_OP_TEXT_FRAME){
+                if(finFlag){
+                    //last frame of fragmented frames
+                    NSString *msg = [[NSString alloc] initWithBytes:[accumuData bytes] length:msgLength encoding:NSUTF8StringEncoding];
+                    [self didReceiveMessage:msg];
+                    accumuData = nil;
+                }
+            }
+            else if(firstFrameOpCode == WS_OP_BINARY_FRAME){
+                if(finFlag){
+                    //last frame of fragmented frames
+                    [self didReceiveData:accumuData];
+                    accumuData = nil;
+                }
+            }
+        }
 		else
 		{
 			[self didClose];
