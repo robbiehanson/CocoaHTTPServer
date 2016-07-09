@@ -735,7 +735,10 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	{
 		//FIX: 64 bit length
 		UInt8 *pFrame = (UInt8 *)[data bytes];
-		NSUInteger length = ((NSUInteger)pFrame[0] << 56) | ((NSUInteger)pFrame[1]<<48) | ((NSUInteger)pFrame[2] << 40) | ((NSUInteger)pFrame[3]<<32) | ((NSUInteger)pFrame[4] << 24) | ((NSUInteger)pFrame[5]<<16) | ((NSUInteger)pFrame[6] << 8) | (NSUInteger)pFrame[7];
+		uint64_t length = ((uint64_t)pFrame[0] << 56) | ((uint64_t)pFrame[1]<<48) | ((uint64_t)pFrame[2] << 40) | ((uint64_t)pFrame[3]<<32)
+        | ((uint64_t)pFrame[4] << 24) | ((uint64_t)pFrame[5]<<16) | ((uint64_t)pFrame[6] << 8) | (uint64_t)pFrame[7];
+		//althouth this is a 64bit unsigned integer length, it is used because data frame is greater than 64k
+		//here, we assume that the actual length will fit in a 32bit integer
 		if (nextFrameMasked) {
 			[asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
 		}
