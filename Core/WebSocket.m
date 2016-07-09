@@ -735,11 +735,10 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 	{
 		//FIX: 64 bit length
 		UInt8 *pFrame = (UInt8 *)[data bytes];
-        NSUInteger length = ((NSUInteger)pFrame[0] << 56) | ((NSUInteger)pFrame[1]<<48) | ((NSUInteger)pFrame[2] << 40) | ((NSUInteger)pFrame[3]<<32)
-        | ((NSUInteger)pFrame[4] << 24) | ((NSUInteger)pFrame[5]<<16) | ((NSUInteger)pFrame[6] << 8) | (NSUInteger)pFrame[7];
-        if (nextFrameMasked) {
+		NSUInteger length = ((NSUInteger)pFrame[0] << 56) | ((NSUInteger)pFrame[1]<<48) | ((NSUInteger)pFrame[2] << 40) | ((NSUInteger)pFrame[3]<<32) | ((NSUInteger)pFrame[4] << 24) | ((NSUInteger)pFrame[5]<<16) | ((NSUInteger)pFrame[6] << 8) | (NSUInteger)pFrame[7];
+		if (nextFrameMasked) {
             [asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
-        }
+		}
         [asyncSocket readDataToLength:length withTimeout:TIMEOUT_NONE tag:TAG_MSG_WITH_LENGTH];
 	}
 	else if (tag == TAG_MSG_WITH_LENGTH)
@@ -762,7 +761,7 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		}
 		else if(nextOpCode == WS_OP_PING || nextOpCode == WS_OP_PONG){
             //FIX ME: respond to PING and PONG
-			//But at least, we should not close connection for ping and pong
+            //But at least, we should not close connection for ping and pong
         }
 		else
 		{
