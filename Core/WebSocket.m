@@ -739,7 +739,7 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		if (nextFrameMasked) {
             [asyncSocket readDataToLength:4 withTimeout:TIMEOUT_NONE tag:TAG_MSG_MASKING_KEY];
 		}
-        [asyncSocket readDataToLength:length withTimeout:TIMEOUT_NONE tag:TAG_MSG_WITH_LENGTH];
+		[asyncSocket readDataToLength:length withTimeout:TIMEOUT_NONE tag:TAG_MSG_WITH_LENGTH];
 	}
 	else if (tag == TAG_MSG_WITH_LENGTH)
 	{
@@ -762,7 +762,7 @@ static inline NSUInteger WS_PAYLOAD_LENGTH(UInt8 frame)
 		else if(nextOpCode == WS_OP_PING || nextOpCode == WS_OP_PONG){
             //FIX ME: respond to PING and PONG
             //But at least, we should not close connection for ping and pong
-        }
+		}
 		else
 		{
 			[self didClose];
