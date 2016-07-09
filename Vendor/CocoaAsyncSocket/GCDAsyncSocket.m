@@ -4263,10 +4263,9 @@ enum GCDAsyncSocketConfig
 	}
 	else
 	{
-		#if SECURE_TRANSPORT_MAYBE_AVAILABLE
-		
 		estimatedBytesAvailable = socketFDBytesAvailable;
 		
+#if SECURE_TRANSPORT_MAYBE_AVAILABLE
 		if (flags & kSocketSecure)
 		{
 			// There are 2 buffers to be aware of here.
@@ -4303,9 +4302,9 @@ enum GCDAsyncSocketConfig
 			estimatedBytesAvailable += sslInternalBufSize;
 		}
 		
+#endif
 		hasBytesAvailable = (estimatedBytesAvailable > 0);
 		
-		#endif
 	}
 	
 	if ((hasBytesAvailable == NO) && ([preBuffer availableBytes] == 0))
