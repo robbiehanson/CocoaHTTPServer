@@ -161,9 +161,9 @@
 		// It is OK if we ask to read more bytes than exist in the file.
 		// It is NOT OK to over-allocate the buffer.
 		
-		unsigned long long _bytesAvailableOnFD = dispatch_source_get_data(readSource);
+      unsigned long long _bytesAvailableOnFD = dispatch_source_get_data(self->readSource);
 		
-		UInt64 _bytesLeftInFile = fileLength - readOffset;
+      UInt64 _bytesLeftInFile = self->fileLength - self->readOffset;
 		
 		NSUInteger bytesAvailableOnFD;
 		NSUInteger bytesLeftInFile;
@@ -171,7 +171,7 @@
 		bytesAvailableOnFD = (_bytesAvailableOnFD > NSUIntegerMax) ? NSUIntegerMax : (NSUInteger)_bytesAvailableOnFD;
 		bytesLeftInFile    = (_bytesLeftInFile    > NSUIntegerMax) ? NSUIntegerMax : (NSUInteger)_bytesLeftInFile;
 		
-		NSUInteger bytesLeftInRequest = readRequestLength - readBufferOffset;
+      NSUInteger bytesLeftInRequest = self->readRequestLength - self->readBufferOffset;
 		
 		NSUInteger bytesLeft = MIN(bytesLeftInRequest, bytesLeftInFile);
 		
@@ -180,12 +180,12 @@
 		// Make sure buffer is big enough for read request.
 		// Do not over-allocate.
 		
-		if (readBuffer == NULL || bytesToRead > (readBufferSize - readBufferOffset))
+      if (self->readBuffer == NULL || bytesToRead > (self->readBufferSize - self->readBufferOffset))
 		{
-			readBufferSize = bytesToRead;
-			readBuffer = reallocf(readBuffer, (size_t)bytesToRead);
+         self->readBufferSize = bytesToRead;
+         self->readBuffer = reallocf(self->readBuffer, (size_t)bytesToRead);
 			
-			if (readBuffer == NULL)
+         if (self->readBuffer == NULL)
 			{
 //				HTTPLogError(@"%@[%p]: Unable to allocate buffer", THIS_FILE, self);
 
@@ -200,7 +200,7 @@
 		
 //		HTTPLogVerbose(@"%@[%p]: Attempting to read %lu bytes from file", THIS_FILE, self, (unsigned long)bytesToRead);
 
-		ssize_t result = read(fileFD, readBuffer + readBufferOffset, (size_t)bytesToRead);
+      ssize_t result = read(self->fileFD, self->readBuffer + self->readBufferOffset, (size_t)bytesToRead);
 		
 		// Check the results
 		if (result < 0)
@@ -221,8 +221,8 @@
 		{
 //			HTTPLogVerbose(@"%@[%p]: Read %lu bytes from file", THIS_FILE, self, (unsigned long)result);
 
-			readOffset += result;
-			readBufferOffset += result;
+         self->readOffset += result;
+         self->readBufferOffset += result;
 			
 			[self pauseReadSource];
 			[self processReadBuffer];
@@ -338,9 +338,9 @@
 		
 		dispatch_sync(readQueue, ^{
 			
-			NSAssert(readSourceSuspended, @"Invalid logic - perhaps HTTPConnection has changed.");
+         NSAssert(self->readSourceSuspended, @"Invalid logic - perhaps HTTPConnection has changed.");
 			
-			readRequestLength = length;
+         self->readRequestLength = length;
 			[self resumeReadSource];
 		});
 		
@@ -378,7 +378,7 @@
 		dispatch_sync(readQueue, ^{
 			
 			// Prevent any further calls to the connection
-			connection = nil;
+         self->connection = nil;
 			
 			// Cancel the readSource.
 			// We do this here because the readSource's eventBlock has retained self.
