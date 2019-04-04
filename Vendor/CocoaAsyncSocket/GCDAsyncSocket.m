@@ -3954,7 +3954,7 @@ enum GCDAsyncSocketConfig
 	
 	dispatch_block_t block = ^{
 		
-      if (!self->currentRead || ![currentRead isKindOfClass:[GCDAsyncReadPacket class]])
+      if (!self->currentRead || ![self->currentRead isKindOfClass:[GCDAsyncReadPacket class]])
 		{
 			// We're not reading anything right now.
 			
@@ -4138,7 +4138,7 @@ enum GCDAsyncSocketConfig
 		// from the encrypted bytes in the sslPreBuffer.
 		// However, we do know this is an upper bound on the estimation.
 		
-      estimatedBytesAvailable = self->socketFDBytesAvailable + [sslPreBuffer availableBytes];
+      estimatedBytesAvailable = self->socketFDBytesAvailable + [self->sslPreBuffer availableBytes];
 		
 		size_t sslInternalBufSize = 0;
       SSLGetBufferedReadSize(self->sslContext, &sslInternalBufSize);
@@ -5833,7 +5833,7 @@ enum GCDAsyncSocketConfig
 	
 	dispatch_async(socketQueue, ^{ @autoreleasepool {
 		
-      if ((self->flags & kSocketStarted) && !(flags & kQueuedTLS) && !(flags & kForbidReadsWrites))
+      if ((self->flags & kSocketStarted) && !(self->flags & kQueuedTLS) && !(self->flags & kForbidReadsWrites))
 		{
          [self->readQueue addObject:packet];
          [self->writeQueue addObject:packet];
