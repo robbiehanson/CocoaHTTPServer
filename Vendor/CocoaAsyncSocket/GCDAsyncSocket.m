@@ -1154,10 +1154,9 @@ enum GCDAsyncSocketConfig
 	else
 	{
 		__block id result;
-		__block typeof(self) bSelf = self;
       
 		dispatch_sync(socketQueue, ^{
-			result = bSelf.delegate;
+			result = delegate;
 		});
 		
 		return result;
@@ -1166,10 +1165,8 @@ enum GCDAsyncSocketConfig
 
 - (void)setDelegate:(id)newDelegate synchronously:(BOOL)synchronously
 {
-   __block typeof(self) bSelf = self;
-   
 	dispatch_block_t block = ^{
-		bSelf->delegate = newDelegate;
+		delegate = newDelegate;
 	};
 	
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
@@ -1195,18 +1192,16 @@ enum GCDAsyncSocketConfig
 
 - (dispatch_queue_t)delegateQueue
 {
-   __block typeof(self) bSelf = self;
-   
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
 	{
-		return bSelf->delegateQueue;
+		return delegateQueue;
 	}
 	else
 	{
 		__block dispatch_queue_t result;
       
 		dispatch_sync(socketQueue, ^{
-			result = bSelf->delegateQueue;
+			result = delegateQueue;
 		});
 		
 		return result;
@@ -1224,7 +1219,7 @@ enum GCDAsyncSocketConfig
 		if (newDelegateQueue) dispatch_retain(newDelegateQueue);
 		#endif
 		
-		bSelf.delegateQueue = newDelegateQueue;
+		delegateQueue = newDelegateQueue;
 	};
 	
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
@@ -1250,12 +1245,10 @@ enum GCDAsyncSocketConfig
 
 - (void)getDelegate:(id *)delegatePtr delegateQueue:(dispatch_queue_t *)delegateQueuePtr
 {
-   __block typeof(self) bSelf = self;
-   
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
 	{
-		if (delegatePtr) *delegatePtr = bSelf.delegate;
-		if (delegateQueuePtr) *delegateQueuePtr = bSelf.delegateQueue;
+		if (delegatePtr) *delegatePtr = delegate;
+		if (delegateQueuePtr) *delegateQueuePtr = delegateQueue;
 	}
 	else
 	{
@@ -1263,8 +1256,8 @@ enum GCDAsyncSocketConfig
 		__block dispatch_queue_t dqPtr = NULL;
       
 		dispatch_sync(socketQueue, ^{
-			dPtr = bSelf.delegate;
-			dqPtr = bSelf.delegateQueue;
+			dPtr = delegate;
+			dqPtr = delegateQueue;
 		});
 		
 		if (delegatePtr) *delegatePtr = dPtr;
@@ -1274,18 +1267,16 @@ enum GCDAsyncSocketConfig
 
 - (void)setDelegate:(id)newDelegate delegateQueue:(dispatch_queue_t)newDelegateQueue synchronously:(BOOL)synchronously
 {
-   __block typeof(self) bSelf = self;
-   
 	dispatch_block_t block = ^{
 		
-		bSelf.delegate = newDelegate;
+		delegate = newDelegate;
 		
 		#if NEEDS_DISPATCH_RETAIN_RELEASE
 		if (delegateQueue) dispatch_release(delegateQueue);
 		if (newDelegateQueue) dispatch_retain(newDelegateQueue);
 		#endif
 		
-		bSelf.delegateQueue = newDelegateQueue;
+		delegateQueue = newDelegateQueue;
 	};
 	
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
@@ -1558,12 +1549,11 @@ enum GCDAsyncSocketConfig
 	};
 	
 	// Create dispatch block and run on socketQueue
-	
    __block typeof(self) bSelf = self;
-   
+
 	dispatch_block_t block = ^{ @autoreleasepool {
 		
-		if (bSelf->delegate == nil) // Must have delegate set
+		if (delegate == nil) // Must have delegate set
 		{
 			NSString *msg = @"Attempting to accept without a delegate. Set a delegate first.";
 			err = [self badConfigError:msg];
@@ -1571,7 +1561,7 @@ enum GCDAsyncSocketConfig
 			return_from_block;
 		}
 		
-		if (bSelf->delegateQueue == NULL) // Must have delegate queue set
+		if (delegateQueue == NULL) // Must have delegate queue set
 		{
 			NSString *msg = @"Attempting to accept without a delegate queue. Set a delegate queue first.";
 			err = [self badConfigError:msg];
