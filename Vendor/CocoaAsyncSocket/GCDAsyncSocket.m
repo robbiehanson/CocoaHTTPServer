@@ -1209,9 +1209,7 @@ enum GCDAsyncSocketConfig
 }
 
 - (void)setDelegateQueue:(dispatch_queue_t)newDelegateQueue synchronously:(BOOL)synchronously
-{
-   __block typeof(self) bSelf = self;
-   
+{   
 	dispatch_block_t block = ^{
 		
 		#if NEEDS_DISPATCH_RETAIN_RELEASE
