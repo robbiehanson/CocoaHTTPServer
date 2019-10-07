@@ -53,7 +53,7 @@ DDRange DDRangeFromString(NSString *aString)
 	return result;
 }
 
-NSInteger DDRangeCompare(DDRangePointer pDDRange1, DDRangePointer pDDRange2)
+NSComparisonResult DDRangeCompare(DDRangePointer pDDRange1, DDRangePointer pDDRange2)
 {
 	// Comparison basis:
 	// Which range would you encouter first if you started at zero, and began walking towards infinity.
@@ -93,7 +93,7 @@ NSInteger DDRangeCompare(DDRangePointer pDDRange1, DDRangePointer pDDRange2)
 	return result;
 }
 
-- (NSInteger)ddrangeCompare:(NSValue *)other
+- (NSComparisonResult)ddrangeCompare:(NSValue *)other
 {
 	DDRange r1 = [self ddrangeValue];
 	DDRange r2 = [other ddrangeValue];

@@ -44,13 +44,13 @@ FOUNDATION_EXPORT DDRange DDIntersectionRange(DDRange range1, DDRange range2);
 FOUNDATION_EXPORT NSString *DDStringFromRange(DDRange range);
 FOUNDATION_EXPORT DDRange DDRangeFromString(NSString *aString);
 
-NSInteger DDRangeCompare(DDRangePointer pDDRange1, DDRangePointer pDDRange2);
+NSComparisonResult DDRangeCompare(DDRangePointer pDDRange1, DDRangePointer pDDRange2);
 
 @interface NSValue (NSValueDDRangeExtensions)
 
 + (NSValue *)valueWithDDRange:(DDRange)range;
 - (DDRange)ddrangeValue;
 
-- (NSInteger)ddrangeCompare:(NSValue *)ddrangeValue;
+- (NSComparisonResult)ddrangeCompare:(NSValue *)ddrangeValue;
 
 @end
