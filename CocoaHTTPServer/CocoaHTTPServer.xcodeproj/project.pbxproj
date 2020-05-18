@@ -60,7 +60,23 @@
 		D678F10A2472FBB0006DB114 /* DDAbstractDatabaseLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = D678F0FA2472FBB0006DB114 /* DDAbstractDatabaseLogger.m */; };
 		D678F10B2472FBB0006DB114 /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = D678F0FB2472FBB0006DB114 /* DDFileLogger.m */; };
 		D678F10C2472FBB0006DB114 /* DDASLLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = D678F0FC2472FBB0006DB114 /* DDASLLogger.h */; };
+		D678F10F2472FC0A006DB114 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D678F10E2472FC0A006DB114 /* CocoaAsyncSocket.framework */; };
+		D678F1102472FC0A006DB114 /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D678F10E2472FC0A006DB114 /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D678F1112472FC0A006DB114 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D678F1102472FC0A006DB114 /* CocoaAsyncSocket.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D66818E92472F738008CD1B1 /* CocoaHTTPServer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CocoaHTTPServer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -118,6 +134,7 @@
 		D678F0FA2472FBB0006DB114 /* DDAbstractDatabaseLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDAbstractDatabaseLogger.m; sourceTree = "<group>"; };
 		D678F0FB2472FBB0006DB114 /* DDFileLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDFileLogger.m; sourceTree = "<group>"; };
 		D678F0FC2472FBB0006DB114 /* DDASLLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDASLLogger.h; sourceTree = "<group>"; };
+		D678F10E2472FC0A006DB114 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaAsyncSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D678F10F2472FC0A006DB114 /* CocoaAsyncSocket.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,6 +156,7 @@
 				D678F0EA2472FB91006DB114 /* Vendor */,
 				D66818EB2472F738008CD1B1 /* CocoaHTTPServer */,
 				D66818EA2472F738008CD1B1 /* Products */,
+				D678F10D2472FC0A006DB114 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -265,6 +284,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		D678F10D2472FC0A006DB114 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D678F10E2472FC0A006DB114 /* CocoaAsyncSocket.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -313,6 +340,7 @@
 				D66818E52472F738008CD1B1 /* Sources */,
 				D66818E62472F738008CD1B1 /* Frameworks */,
 				D66818E72472F738008CD1B1 /* Resources */,
+				D678F1112472FC0A006DB114 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

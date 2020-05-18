@@ -1,9 +1,9 @@
 #import "WebSocket.h"
 #import "HTTPMessage.h"
-#import "GCDAsyncSocket.h"
 #import "DDNumber.h"
 #import "DDData.h"
 #import "HTTPLogging.h"
+@import CocoaAsyncSocket;
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
