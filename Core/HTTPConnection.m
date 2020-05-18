@@ -611,7 +611,7 @@ static NSMutableArray *recentNonces;
 		if ([certificates count] > 0)
 		{
 			// All connections are assumed to be secure. Only secure connections are allowed on this server.
-			NSMutableDictionary *settings = [NSMutableDictionary dictionaryWithCapacity:3];
+			NSMutableDictionary *settings = [NSMutableDictionary dictionaryWithCapacity:2];
 			
 			// Configure this connection as the server
 			[settings setObject:[NSNumber numberWithBool:YES]
@@ -620,9 +620,12 @@ static NSMutableArray *recentNonces;
 			[settings setObject:certificates
 						 forKey:(NSString *)kCFStreamSSLCertificates];
 			
+         //Important note: Commenting the follwing lines out to allow self signed cert connection for TSCConnect.
+         /*
 			// Configure this connection to use the highest possible SSL level
 			[settings setObject:(NSString *)kCFStreamSocketSecurityLevelNegotiatedSSL
 						 forKey:(NSString *)kCFStreamSSLLevel];
+          */
 			
 			[asyncSocket startTLS:settings];
 		}
