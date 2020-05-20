@@ -246,7 +246,7 @@
 			NSUInteger sizeToPass = workingData.length - offset - sizeToLeavePending;
 
 			// if we parse BASE64 encoded data, or Quoted-Printable data, we will make sure we don't break the format
-			int leaveTrailing = [self numberOfBytesToLeavePendingWithData:data length:sizeToPass encoding:currentEncoding];
+			int leaveTrailing = [self numberOfBytesToLeavePendingWithData:data length:(int)sizeToPass encoding:currentEncoding];
 			sizeToPass -= leaveTrailing;
 			
 			if( sizeToPass <= 0 ) {
