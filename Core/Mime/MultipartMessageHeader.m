@@ -8,16 +8,14 @@
 #import "MultipartMessageHeader.h"
 #import "MultipartMessageHeaderField.h"
 
-#import "HTTPLogging.h"
-
 //-----------------------------------------------------------------
 #pragma mark log level
 
-#ifdef DEBUG
-static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
-#else
-static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
-#endif
+//#ifdef DEBUG
+//static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
+//#else
+//static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
+//#endif
 
 //-----------------------------------------------------------------
 // implementation MultipartMessageHeader
@@ -52,11 +50,11 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			MultipartMessageHeaderField* field = [[MultipartMessageHeaderField alloc] initWithData: fieldData  contentEncoding:formEncoding];
 			if( field ) {
 				[fields setObject:field forKey:field.name];
-				HTTPLogVerbose(@"MultipartFormDataParser: Processed Header field '%@'",field.name);
+//				HTTPLogVerbose(@"MultipartFormDataParser: Processed Header field '%@'",field.name);
 			}
 			else {
-				NSString* fieldStr = [[NSString  alloc] initWithData:fieldData encoding:NSASCIIStringEncoding];
-				HTTPLogWarn(@"MultipartFormDataParser: Failed to parse MIME header field. Input ASCII string:%@",fieldStr);
+//				NSString* fieldStr = [[NSString  alloc] initWithData:fieldData encoding:NSASCIIStringEncoding];
+//				HTTPLogWarn(@"MultipartFormDataParser: Failed to parse MIME header field. Input ASCII string:%@",fieldStr);
 			}
 
 			// move to the next header field
