@@ -569,6 +569,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.TechSmith.CocoaHTTPServer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -592,6 +593,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.TechSmith.CocoaHTTPServer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};
