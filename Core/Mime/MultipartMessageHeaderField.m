@@ -78,7 +78,7 @@ NSString* extractParamValue(const char* bytes, NSUInteger length, NSStringEncodi
 
 	// parse the "params" part of the header
 	if( ![self parseHeaderValueBytes:bytes length:length encoding:encoding] ) {
-		NSString* paramsStr = [[NSString alloc] initWithBytes:bytes length:length encoding:NSASCIIStringEncoding];
+//		NSString* paramsStr = [[NSString alloc] initWithBytes:bytes length:length encoding:NSASCIIStringEncoding];
 //		HTTPLogError(@"MultipartFormDataParser: Bad params for header with name '%@' and value '%@'",name,value);
 //		HTTPLogError(@"MultipartFormDataParser: Params str: %@",paramsStr);
 

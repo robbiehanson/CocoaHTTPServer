@@ -28,7 +28,7 @@
 - (int) findHeaderEnd:(NSData*) workingData fromOffset:(int) offset;
 - (int) findContentEnd:(NSData*) data fromOffset:(int) offset;
 
-- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(NSUInteger) length encoding:(int) encoding;
+- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(int) length encoding:(int) encoding;
 - (int) offsetTillNewlineSinceOffset:(int) offset inData:(NSData*) data;
 
 - (int) processPreamble:(NSData*) workingData;
