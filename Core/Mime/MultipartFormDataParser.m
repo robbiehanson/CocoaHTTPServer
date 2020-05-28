@@ -1,15 +1,14 @@
 
 #import "MultipartFormDataParser.h"
 #import "DDData.h"
-#import "HTTPLogging.h"
 
 #pragma mark log level
 
-#ifdef DEBUG
-static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
-#else
-static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
-#endif
+//#ifdef DEBUG
+//static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
+//#else
+//static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
+//#endif
 
 #ifdef __x86_64__
 #define FMTNSINT "li"
@@ -29,7 +28,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 - (int) findHeaderEnd:(NSData*) workingData fromOffset:(int) offset;
 - (int) findContentEnd:(NSData*) data fromOffset:(int) offset;
 
-- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(NSUInteger) length encoding:(int) encoding;
+- (int) numberOfBytesToLeavePendingWithData:(NSData*) data length:(int) length encoding:(int) encoding;
 - (int) offsetTillNewlineSinceOffset:(int) offset inData:(NSData*) data;
 
 - (int) processPreamble:(NSData*) workingData;
@@ -50,7 +49,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
         return self;
     }
 	if( nil == boundary ) {
-		HTTPLogWarn(@"MultipartFormDataParser: init with zero boundary");
+//		HTTPLogWarn(@"MultipartFormDataParser: init with zero boundary");
 		return nil;
 	}
     boundaryData = [[@"\r\n--" stringByAppendingString:boundary] dataUsingEncoding:NSASCIIStringEncoding];
@@ -70,7 +69,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 - (BOOL) appendData:(NSData *)data { 
     // Can't parse without boundary;
     if( nil == boundaryData ) {
-		HTTPLogError(@"MultipartFormDataParser: Trying to parse multipart without specifying a valid boundary");
+//		HTTPLogError(@"MultipartFormDataParser: Trying to parse multipart without specifying a valid boundary");
 		assert(false);
         return NO;
     }
@@ -101,7 +100,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			if(	pendingData.length >= 2 ) {
 				if( *(uint16_t*)(pendingData.bytes + offset) == 0x2D2D ) {
 					// we found the multipart end. all coming next is an epilogue.
-					HTTPLogVerbose(@"MultipartFormDataParser: End of multipart message");
+//					HTTPLogVerbose(@"MultipartFormDataParser: End of multipart message");
 					waitingForCRLF = YES;
 					reachedEpilogue = YES;
 					offset+= 2;
@@ -127,7 +126,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 				char* bytes = (char*) workingData.bytes;
 				if( *(uint16_t*)(bytes + offset) == 0x2D2D ) {
 					// we found the multipart end. all coming next is an epilogue.
-					HTTPLogVerbose(@"MultipartFormDataParser: End of multipart message");
+//					HTTPLogVerbose(@"MultipartFormDataParser: End of multipart message");
 					checkForContentEnd = NO;
 					reachedEpilogue = YES;
 					// still wait for CRLF, that comes after boundary, but before epilogue.
@@ -223,14 +222,14 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 
 				if( nil == currentHeader ) {
 					// we've found the data is in wrong format.
-					HTTPLogError(@"MultipartFormDataParser: MultipartFormDataParser: wrong input format, coulnd't get a valid header");
+//					HTTPLogError(@"MultipartFormDataParser: MultipartFormDataParser: wrong input format, coulnd't get a valid header");
 					return NO;
 				}
                 if( [delegate respondsToSelector:@selector(processStartOfPartWithHeader:)] ) {
                     [delegate processStartOfPartWithHeader:currentHeader];
                 }
 
-				HTTPLogVerbose(@"MultipartFormDataParser: MultipartFormDataParser: Retrieved part header.");
+//				HTTPLogVerbose(@"MultipartFormDataParser: MultipartFormDataParser: Retrieved part header.");
 			}
 			// skip the two trailing \r\n, in addition to the whole header.
 			offset = headerEnd + 4;	
@@ -247,7 +246,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			NSUInteger sizeToPass = workingData.length - offset - sizeToLeavePending;
 
 			// if we parse BASE64 encoded data, or Quoted-Printable data, we will make sure we don't break the format
-			int leaveTrailing = [self numberOfBytesToLeavePendingWithData:data length:sizeToPass encoding:currentEncoding];
+			int leaveTrailing = [self numberOfBytesToLeavePendingWithData:data length:(int)sizeToPass encoding:currentEncoding];
 			sizeToPass -= leaveTrailing;
 			
 			if( sizeToPass <= 0 ) {
@@ -261,7 +260,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			NSData* decodedData = [MultipartFormDataParser decodedDataFromData:[NSData dataWithBytesNoCopy:(char*)workingData.bytes + offset length:workingData.length - offset - sizeToLeavePending freeWhenDone:NO] encoding:currentEncoding];
 			
 			if( [delegate respondsToSelector:@selector(processContent:WithHeader:)] ) {
-				HTTPLogVerbose(@"MultipartFormDataParser: Processed %"FMTNSINT" bytes of body",sizeToPass);
+//				HTTPLogVerbose(@"MultipartFormDataParser: Processed %"FMTNSINT" bytes of body",sizeToPass);
 
 				[delegate processContent: decodedData WithHeader:currentHeader];
 			}
@@ -280,7 +279,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 
 			if( [delegate respondsToSelector:@selector(processEndOfPartWithHeader:)] ){
 				[delegate processEndOfPartWithHeader:currentHeader];
-				HTTPLogVerbose(@"MultipartFormDataParser: End of body part");
+//				HTTPLogVerbose(@"MultipartFormDataParser: End of body part");
 			}
 			currentHeader = nil;
 
@@ -310,10 +309,10 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 		// in debug, we might also want to know, if the file is somehow misformatted.
 #ifdef DEBUG
 		if( !isspace(*(bytes+offset)) ) {
-			HTTPLogWarn(@"MultipartFormDataParser: Warning, non-whitespace character '%c' between boundary bytes and CRLF in boundary line",*(bytes+offset) );
+//			HTTPLogWarn(@"MultipartFormDataParser: Warning, non-whitespace character '%c' between boundary bytes and CRLF in boundary line",*(bytes+offset) );
 		}
 		if( !isspace(*(bytes+offset+1)) ) {
-			HTTPLogWarn(@"MultipartFormDataParser: Warning, non-whitespace character '%c' between boundary bytes and CRLF in boundary line",*(bytes+offset+1) );
+//			HTTPLogWarn(@"MultipartFormDataParser: Warning, non-whitespace character '%c' between boundary bytes and CRLF in boundary line",*(bytes+offset+1) );
 		}
 #endif
 		offset++;
@@ -356,7 +355,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			if( [delegate respondsToSelector:@selector(processPreambleData:)] ) {
 				NSData* preambleData = [NSData dataWithBytesNoCopy: (char*) data.bytes length: data.length - offset - boundaryLength freeWhenDone:NO];
 				[delegate processPreambleData:preambleData];
-				HTTPLogVerbose(@"MultipartFormDataParser: processed preamble");
+//				HTTPLogVerbose(@"MultipartFormDataParser: processed preamble");
 			}
 			pendingData = [NSMutableData dataWithBytes: data.bytes + data.length - boundaryLength length:boundaryLength];
 		}
@@ -490,7 +489,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 			count = 0;
 
 			if( length < 3 ) {
-				HTTPLogWarn(@"MultipartFormDataParser: warning, trailing '=' in quoted printable data");
+//				HTTPLogWarn(@"MultipartFormDataParser: warning, trailing '=' in quoted printable data");
 			}
 			// soft newline
 			if( bytes[0] == '\r' ) {
@@ -516,7 +515,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN;
 
 #ifdef DEBUG
 		if( (unsigned char) bytes[count] > 126 ) {
-			HTTPLogWarn(@"MultipartFormDataParser: Warning, character with code above 126 appears in quoted printable encoded data");
+//			HTTPLogWarn(@"MultipartFormDataParser: Warning, character with code above 126 appears in quoted printable encoded data");
 		}
 #endif
 		
