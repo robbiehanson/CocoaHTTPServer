@@ -45,23 +45,8 @@
 		D678F0E82472FAB9006DB114 /* WebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D678F0E62472FAB9006DB114 /* WebSocket.h */; };
 		D678F0E92472FAB9006DB114 /* WebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = D678F0E72472FAB9006DB114 /* WebSocket.m */; };
 		D678F10F2472FC0A006DB114 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D678F10E2472FC0A006DB114 /* CocoaAsyncSocket.framework */; };
-		D678F1102472FC0A006DB114 /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D678F10E2472FC0A006DB114 /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D678F11A247302B4006DB114 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D678F119247302B4006DB114 /* Foundation.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		D678F1112472FC0A006DB114 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D678F1102472FC0A006DB114 /* CocoaAsyncSocket.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D66818E92472F738008CD1B1 /* CocoaHTTPServer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CocoaHTTPServer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -264,7 +249,6 @@
 				D66818E52472F738008CD1B1 /* Sources */,
 				D66818E62472F738008CD1B1 /* Frameworks */,
 				D66818E72472F738008CD1B1 /* Resources */,
-				D678F1112472FC0A006DB114 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
