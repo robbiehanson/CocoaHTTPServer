@@ -1,12 +1,6 @@
 #import "DynamicServerAppDelegate.h"
 #import "HTTPServer.h"
 #import "MyHTTPConnection.h"
-#import "DDLog.h"
-#import "DDTTYLogger.h"
-
-// Log levels: off, error, warn, info, verbose
-static const int ddLogLevel = LOG_LEVEL_VERBOSE;
-
 
 @implementation DynamicServerAppDelegate
 
@@ -14,10 +8,6 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	// Configure our logging framework.
-	// To keep things simple and fast, we're just going to log to the Xcode console.
-	[DDLog addLogger:[DDTTYLogger sharedInstance]];
-	
 	// Initalize our http server
 	httpServer = [[HTTPServer alloc] init];
 	
@@ -35,7 +25,7 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 	
 	// Serve files from our embedded Web folder
 	NSString *webPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"Web"];
-	DDLogVerbose(@"Setting document root: %@", webPath);
+	os_log(@"Setting document root: %@", webPath);
 	
 	[httpServer setDocumentRoot:webPath];
 	

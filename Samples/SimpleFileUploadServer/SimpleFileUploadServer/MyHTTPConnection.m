@@ -160,12 +160,12 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE; // | HTTP_LOG_FLAG_TRACE
         storeFile = nil;
     }
     else {
-		HTTPLogVerbose(@"Saving file to %@", filePath);
+		HTTPLogVerbose("Saving file to %@", filePath);
 		if(![[NSFileManager defaultManager] createDirectoryAtPath:uploadDirPath withIntermediateDirectories:true attributes:nil error:nil]) {
-			HTTPLogError(@"Could not create directory at path: %@", filePath);
+			HTTPLogError("Could not create directory at path: %@", filePath);
 		}
 		if(![[NSFileManager defaultManager] createFileAtPath:filePath contents:nil attributes:nil]) {
-			HTTPLogError(@"Could not create file at path: %@", filePath);
+			HTTPLogError("Could not create file at path: %@", filePath);
 		}
 		storeFile = [NSFileHandle fileHandleForWritingAtPath:filePath];
 		[uploadedFiles addObject: [NSString stringWithFormat:@"/upload/%@", filename]];

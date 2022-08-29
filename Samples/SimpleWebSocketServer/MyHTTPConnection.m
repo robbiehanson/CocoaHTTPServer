@@ -54,11 +54,11 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 
 - (WebSocket *)webSocketForURI:(NSString *)path
 {
-	HTTPLogTrace2(@"%@[%p]: webSocketForURI: %@", THIS_FILE, self, path);
+	HTTPLogTrace2("webSocketForURI: %@", self, path);
 	
 	if([path isEqualToString:@"/service"])
 	{
-		HTTPLogInfo(@"MyHTTPConnection: Creating MyWebSocket...");
+		HTTPLogInfo("MyHTTPConnection: Creating MyWebSocket...");
 		
 		return [[MyWebSocket alloc] initWithRequest:request socket:asyncSocket];		
 	}

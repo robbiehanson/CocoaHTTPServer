@@ -52,7 +52,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	
 	if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/post.html"])
 	{
-		HTTPLogVerbose(@"%@[%p]: postContentLength: %qu", THIS_FILE, self, requestContentLength);
+		HTTPLogVerbose("postContentLength: %qu", self, requestContentLength);
 		
 		NSString *postStr = nil;
 		
@@ -62,7 +62,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 			postStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
 		}
 		
-		HTTPLogVerbose(@"%@[%p]: postStr: %@", THIS_FILE, self, postStr);
+		HTTPLogVerbose("postStr: %@", self, postStr);
 		
 		// Result will be of the form "answer=..."
 		
@@ -104,7 +104,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	BOOL result = [request appendData:postDataChunk];
 	if (!result)
 	{
-		HTTPLogError(@"%@[%p]: %@ - Couldn't append bytes!", THIS_FILE, self, THIS_METHOD);
+		HTTPLogError("%@ - Couldn't append bytes!", self, THIS_METHOD);
 	}
 }
 

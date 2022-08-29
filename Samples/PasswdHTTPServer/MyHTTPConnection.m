@@ -14,7 +14,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_VERBOSE | HTTP_LOG_FLAG_TRACE;
 	
 	BOOL result = [path hasPrefix:@"/secret"];
 	
-	HTTPLogTrace2(@"%@[%p]: isPasswordProtected(%@) - %@", THIS_FILE, self, path, (result ? @"YES" : @"NO"));
+	HTTPLogTrace2("isPasswordProtected(%@) - %@", self, path, (result ? @"YES" : @"NO"));
 	
 	return result;
 }

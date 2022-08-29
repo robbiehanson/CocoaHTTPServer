@@ -95,7 +95,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_OFF; // | HTTP_LOG_FLAG_TRACE;
 
 - (BOOL)delayResponseHeaders
 {
-	HTTPLogTrace2(@"%@[%p] %@ -> %@", THIS_FILE, self, THIS_METHOD, (readyToSendResponseHeaders ? @"NO" : @"YES"));
+	HTTPLogTrace2("delayResponseHeaders -> %@", (readyToSendResponseHeaders ? @"NO" : @"YES"));
 	
 	__block BOOL delayResponseHeaders = NO;
 	

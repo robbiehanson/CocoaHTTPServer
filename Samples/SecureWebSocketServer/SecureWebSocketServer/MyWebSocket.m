@@ -17,7 +17,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN | HTTP_LOG_FLAG_TRACE;
 
 - (void)didReceiveMessage:(NSString *)msg
 {
-	HTTPLogTrace2(@"%@[%p]: didReceiveMessage: %@", THIS_FILE, self, msg);
+	HTTPLogTrace2("didReceiveMessage: %@", self, msg);
 	
 	[self sendMessage:[NSString stringWithFormat:@"%@", [NSDate date]]];
 }

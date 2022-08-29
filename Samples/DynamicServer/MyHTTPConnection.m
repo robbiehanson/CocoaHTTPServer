@@ -36,7 +36,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	
 	if ([relativePath isEqualToString:@"/index.html"])
 	{
-		HTTPLogVerbose(@"%@[%p]: Serving up dynamic content", THIS_FILE, self);
+		HTTPLogVerbose("Serving up dynamic content", self);
 		
 		// The index.html file contains several dynamic fields that need to be completed.
 		// For example:
@@ -67,7 +67,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 		[replacementDict setObject:@"A"         forKey:@"ALPHABET"];
 		[replacementDict setObject:@"  QUACK  " forKey:@"QUACK"];
 		
-		HTTPLogVerbose(@"%@[%p]: replacementDict = \n%@", THIS_FILE, self, replacementDict);
+		HTTPLogVerbose("replacementDict = \n%@", self, replacementDict);
 		
 		return [[HTTPDynamicFileResponse alloc] initWithFilePath:[self filePathForURI:path]
 		                                            forConnection:self
@@ -76,7 +76,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_WARN; // | HTTP_LOG_FLAG_TRACE;
 	}
 	else if ([relativePath isEqualToString:@"/unittest.html"])
 	{
-		HTTPLogVerbose(@"%@[%p]: Serving up HTTPResponseTest (unit testing)", THIS_FILE, self);
+		HTTPLogVerbose("Serving up HTTPResponseTest (unit testing)", self);
 		
 		return [[HTTPResponseTest alloc] initWithConnection:self];
 	}
