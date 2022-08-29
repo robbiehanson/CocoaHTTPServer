@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "CocoaHTTPServer",
-    defaultLocalization: "de",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v14),
         .macOS(.v10_15)
