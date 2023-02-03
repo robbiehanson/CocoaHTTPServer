@@ -1,10 +1,10 @@
 #import <Foundation/Foundation.h>
-#import "HTTPResponse.h"
+#import "EEHTTPResponse.h"
 
 @class HTTPConnection;
 
 
-@interface HTTPFileResponse : NSObject <HTTPResponse>
+@interface HTTPFileResponse : NSObject <EEHTTPResponse>
 {
 	HTTPConnection *connection;
 	

@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
-#import "HTTPResponse.h"
+#import "EEHTTPResponse.h"
 
 
-@interface HTTPRedirectResponse : NSObject <HTTPResponse>
+@interface HTTPRedirectResponse : NSObject <EEHTTPResponse>
 {
 	NSString *redirectPath;
 }

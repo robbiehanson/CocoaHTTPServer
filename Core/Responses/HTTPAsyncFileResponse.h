@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "HTTPResponse.h"
+#import "EEHTTPResponse.h"
 
 @class HTTPConnection;
 
@@ -11,7 +11,7 @@
  * An example of this is the HTTPDynamicFileResponse class.
 **/
 
-@interface HTTPAsyncFileResponse : NSObject <HTTPResponse>
+@interface HTTPAsyncFileResponse : NSObject <EEHTTPResponse>
 {	
 	HTTPConnection *connection;
 	

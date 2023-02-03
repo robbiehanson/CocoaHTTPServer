@@ -2,7 +2,7 @@
 #import "HTTPServer.h"
 #import "HTTPConnection.h"
 #import "HTTPMessage.h"
-#import "HTTPResponse.h"
+#import "EEHTTPResponse.h"
 #import "HTTPAuthenticationRequest.h"
 #import "DDNumber.h"
 #import "DDRange.h"
@@ -1661,7 +1661,7 @@ static NSMutableArray *recentNonces;
  * HTTPFileResponse is a wrapper for an NSFileHandle object, and is the preferred way to send a file response.
  * HTTPDataResponse is a wrapper for an NSData object, and may be used to send a custom response.
 **/
-- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
+- (NSObject<EEHTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
 {
 	HTTPLogTrace();
 	
@@ -2483,7 +2483,7 @@ static NSMutableArray *recentNonces;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark HTTPResponse Notifications
+#pragma mark EEHTTPResponse Notifications
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -2492,7 +2492,7 @@ static NSMutableArray *recentNonces;
  * 
  * This informs us that the response object has generated more data that we may be able to send.
 **/
-- (void)responseHasAvailableData:(NSObject<HTTPResponse> *)sender
+- (void)responseHasAvailableData:(NSObject<EEHTTPResponse> *)sender
 {
 	HTTPLogTrace();
 	
@@ -2535,7 +2535,7 @@ static NSMutableArray *recentNonces;
  * This method is called if the response encounters some critical error,
  * and it will be unable to fullfill the request.
 **/
-- (void)responseDidAbort:(NSObject<HTTPResponse> *)sender
+- (void)responseDidAbort:(NSObject<EEHTTPResponse> *)sender
 {
 	HTTPLogTrace();
 	

@@ -4,7 +4,7 @@
 @class HTTPMessage;
 @class HTTPServer;
 @class WebSocket;
-@protocol HTTPResponse;
+@protocol EEHTTPResponse;
 
 
 #define HTTPConnectionDidDieNotification  @"HTTPConnectionDidDie"
@@ -49,7 +49,7 @@
 	NSString *nonce;
 	long lastNC;
 	
-	NSObject<HTTPResponse> *httpResponse;
+	NSObject<EEHTTPResponse> *httpResponse;
 	
 	NSMutableArray *ranges;
 	NSMutableArray *ranges_headers;
@@ -90,7 +90,7 @@
 - (NSArray *)directoryIndexFileNames;
 - (NSString *)filePathForURI:(NSString *)path;
 - (NSString *)filePathForURI:(NSString *)path allowDirectory:(BOOL)allowDirectory;
-- (NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path;
+- (NSObject<EEHTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path;
 - (WebSocket *)webSocketForURI:(NSString *)path;
 
 - (void)prepareForBodyWithSize:(UInt64)contentLength;
@@ -114,6 +114,6 @@
 @end
 
 @interface HTTPConnection (AsynchronousHTTPResponse)
-- (void)responseHasAvailableData:(NSObject<HTTPResponse> *)sender;
-- (void)responseDidAbort:(NSObject<HTTPResponse> *)sender;
+- (void)responseHasAvailableData:(NSObject<EEHTTPResponse> *)sender;
+- (void)responseDidAbort:(NSObject<EEHTTPResponse> *)sender;
 @end

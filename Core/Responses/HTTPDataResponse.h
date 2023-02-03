@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
-#import "HTTPResponse.h"
+#import "EEHTTPResponse.h"
 
 
-@interface HTTPDataResponse : NSObject <HTTPResponse>
+@interface HTTPDataResponse : NSObject <EEHTTPResponse>
 {
 	NSUInteger offset;
 	NSData *data;
