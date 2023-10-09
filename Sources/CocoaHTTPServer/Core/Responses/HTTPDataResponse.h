@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "../HTTPResponse.h"
+#import "HTTPResponse.h"
 
 
 @interface HTTPDataResponse : NSObject <HTTPResponse>

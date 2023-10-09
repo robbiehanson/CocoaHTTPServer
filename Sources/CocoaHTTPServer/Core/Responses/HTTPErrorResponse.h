@@ -1,4 +1,4 @@
-#import "../HTTPResponse.h"
+#import "HTTPResponse.h"
 
 @interface HTTPErrorResponse : NSObject <HTTPResponse> {
     NSInteger _status;

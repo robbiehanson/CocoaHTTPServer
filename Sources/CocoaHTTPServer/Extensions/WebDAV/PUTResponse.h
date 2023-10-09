@@ -1,4 +1,4 @@
-#import "../../Core/HTTPResponse.h"
+#import "HTTPResponse.h"
 
 @interface PUTResponse : NSObject <HTTPResponse> {
   NSInteger _status;

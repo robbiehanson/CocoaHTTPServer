@@ -1,4 +1,4 @@
-#import "../../Core/HTTPConnection.h"
+#import "HTTPConnection.h"
 
 @interface DAVConnection : HTTPConnection {
 	id requestContentBody;
